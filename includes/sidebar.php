@@ -84,9 +84,11 @@
                 <span>Submit New</span>
             </a>
         </li>
-
-
+        <li class="nav-item">
+            <a class="nav-link" href="../logout.php">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        </li>
     </ul>
 </aside><!-- End Sidebar-->
-
-<!-- Include Bootstrap Icons CSS -->

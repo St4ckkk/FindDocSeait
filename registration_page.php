@@ -1,10 +1,16 @@
+<?php
+include_once './core/userController.php';
+$userController = new userController();
+$offices = $userController->getOffices();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FindDocSEAIT - Document Tracking System</title>
+    <title>FindDocSEAIT - Register</title>
 
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -13,7 +19,6 @@
     <link rel="stylesheet" href="views/node_modules/sweetalert2/dist/sweetalert2.min.css">
     <script src="views/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="views/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         body {
@@ -149,11 +154,6 @@
             font-size: 14px;
         }
 
-        .g-recaptcha {
-            transform: scale(0.9);
-            transform-origin: 0 0;
-        }
-
         .button-group {
             display: flex;
             justify-content: space-between;
@@ -187,79 +187,64 @@
             color: rgb(226, 123, 24);
             text-decoration: none;
         }
-
-        .swal2-container {
-            z-index: 9999;
-        }
     </style>
 </head>
 
 <body>
+    <!-- Header -->
     <header class="header">
         <div class="d-flex justify-content-between align-items-center">
-            <div class="logo-text">FindDocSEAIT</div>
+            <div class="logo-text">
+                FindDocSEAIT
+            </div>
             <div class="search-bar">
                 <input type="text" placeholder="Tracking Number">
                 <button>Search</button>
             </div>
         </div>
     </header>
+
     <div class="main-content">
         <div class="login-panel">
             <div class="logo">
                 <img src="assets/img/seait-logo.png" alt="SEAIT Logo">
             </div>
-            <div class="form-title">Log In</div>
-            <form id="loginForm" action="login.php" method="POST">
+            <div class="form-title">Register</div>
+            <form id="registerForm" action="register.php" method="POST">
                 <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                    <label class="form-label">ID Number</label>
+                    <input type="text" class="form-control" name="id_number" placeholder="ID Number" required>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" name="fullname" placeholder="Full Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
-                <div class="form-group">
-                    <div class="g-recaptcha" data-sitekey="6Lez8oAqAAAAACcrcb3hCsT3zJgU-R7r0MqeQuY0"></div>
-                </div>
+
                 <div class="button-group">
-                    <button type="submit" class="btn btn-submit w-100">Sign in</button>
+                    <button type="submit" class="btn btn-submit w-100">Register</button>
                 </div>
+
                 <div class="register-link">
-                    <p>Don't have an account? <a href="registration_page.php" class="btn btn-register">Register</a></p>
+                    <p>Already have an account? <a href="index.php" class="btn btn-register">Log In</a></p>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- OTP Modal -->
-    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="otpForm">
-                        <div class="form-group">
-                            <label class="form-label">OTP</label>
-                            <input type="text" class="form-control" name="otp" id="otpInput" placeholder="Enter OTP"
-                                required>
-                        </div>
-                        <div class="button-group mt-3">
-                            <button type="submit" class="btn btn-submit w-100">Verify OTP</button>
-                        </div>
-                    </form>
-                    <button id="getOtpBtn" class="btn btn-info mt-3 w-100">Get OTP</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         $(document).ready(function () {
-            $('#loginForm').on('submit', function (e) {
+            $('#registerForm').on('submit', function (e) {
                 e.preventDefault(); // Prevent the default form submission
 
                 const formData = $(this).serialize();
@@ -270,111 +255,28 @@
                     data: formData,
                     dataType: 'json',
                     success: function (response) {
-                        if (response.status === 'otp_required') {
-                            $('#otpModal').modal('show'); // Show OTP modal
-                        } else if (response.status === 'success') {
+                        if (response.status === 'success') {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
-                                text: 'Login successful!',
+                                text: 'Registration successful!',
                                 allowOutsideClick: false,
                                 showConfirmButton: true
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = 'views/dashboard.php'; // Redirect to dashboard
+                                    window.location.href = 'login.php'; // Redirect to login
                                 }
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: response.message || 'Invalid credentials',
+                                text: response.message || 'Registration failed',
                                 confirmButtonColor: '#d33'
                             });
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Connection Error',
-                            text: 'Failed to connect to the server. Please try again.',
-                            confirmButtonColor: '#d33'
-                        });
-                    }
-                });
-            });
-
-            $('#otpForm').on('submit', function (e) {
-                e.preventDefault(); // Prevent the default form submission
-
-                const formData = $(this).serialize();
-
-                $.ajax({
-                    url: 'login.php',
-                    type: 'POST',
-                    data: formData,
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'OTP verified successfully!',
-                                allowOutsideClick: false,
-                                showConfirmButton: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = 'views/dashboard.php'; // Redirect to dashboard
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'Invalid OTP',
-                                confirmButtonColor: '#d33'
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Connection Error',
-                            text: 'Failed to connect to the server. Please try again.',
-                            confirmButtonColor: '#d33'
-                        });
-                    }
-                });
-            });
-
-            $('#getOtpBtn').on('click', function () {
-                $.ajax({
-                    url: 'login.php',
-                    type: 'POST',
-                    data: { action: 'getOtp' },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            $('#otpInput').val(response.otp); // Automatically populate the OTP field
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'OTP',
-                                text: 'Your OTP is: ' + response.otp,
-                                confirmButtonColor: '#3085d6'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'Failed to get OTP',
-                                confirmButtonColor: '#d33'
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Connection Error',
@@ -386,7 +288,7 @@
             });
         });
     </script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

@@ -56,7 +56,7 @@ foreach ($offices as $office) {
     .document-item {
       background: #e27b18;
       padding: 15px;
-      border-radius: 4px;
+      border-radius: 5px;
       text-align: center;
       transition: all 0.3s;
     }
@@ -213,6 +213,9 @@ foreach ($offices as $office) {
                     <option>Leave (Form 6)</option>
                     <option>Report Card</option>
                     <option>Transcript of Records</option>
+                    <option>Certificate of Enrollment</option>
+                    <option>Good Moral Certificate</option>
+                    <option>Diploma</option>
                   </select>
                 </div>
               </div>
@@ -265,52 +268,51 @@ foreach ($offices as $office) {
           </div>
 
           <div id="requestForm" class="submit-document" style="display: none;">
-            <form id="requestDocumentForm" action="process/request_document.php" method="POST">
-              <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Requestor Name:</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control" name="requestor_name" placeholder="Enter your name">
-                </div>
+            <form id="documentRequestForm" class="row g-3" action="process/request_document.php" method="POST">
+              <div class="col-12">
+                <label for="from" class="form-label">From:</label>
+                <input type="text" class="form-control" id="from" name="requestor_name"
+                  value="<?php echo $_SESSION['fullname']; ?>" readonly>
               </div>
 
-              <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Document Type:</label>
-                <div class="col-sm-8">
-                  <select class="form-control" name="document_type">
-                    <option>Transcript of Records</option>
-                    <option>Certificate of Enrollment</option>
-                    <option>Diploma</option>
-                  </select>
-                </div>
+              <div class="col-12">
+                <label for="documentType" class="form-label">Document Type:</label>
+                <select class="form-select" id="documentType" name="document_type" required>
+                  <option selected disabled>--Select--</option>
+                  <option>Transcript of Records</option>
+                  <option>Certificate of Enrollment</option>
+                  <option>Good Moral Certificate</option>
+                  <option>Diploma</option>
+                </select>
               </div>
 
-              <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Details:</label>
-                <div class="col-sm-8">
-                  <textarea class="form-control" name="details" rows="3" placeholder="Provide details..."></textarea>
-                </div>
+              <div class="col-12">
+                <label for="details" class="form-label">Details:</label>
+                <textarea class="form-control" id="details" name="details" rows="4"
+                  placeholder="Description, Date, Destination" required></textarea>
               </div>
 
-              <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Purpose of Request:</label>
-                <div class="col-sm-8">
-                  <textarea class="form-control" name="purpose" rows="3"
-                    placeholder="Purpose of the request..."></textarea>
-                </div>
+              <div class="col-12">
+                <label for="purpose" class="form-label">Purpose of Request:</label>
+                <textarea class="form-control" id="purpose" name="purpose" rows="4"
+                  placeholder="Purposes or Actions to be taken..." required></textarea>
               </div>
 
-              <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Recipient ID:</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control" name="recipient_id" placeholder="Enter recipient ID">
-                </div>
+              <div class="col-12">
+                <label for="receivingUnit" class="form-label">Office / School Office</label>
+                <select name="office" id="receivingUnit" class="form-select" required>
+                  <option selected disabled>Select Office</option>
+                  <?php foreach ($offices as $office): ?>
+                    <option value="<?php echo $office['office_id']; ?>">
+                      <?php echo htmlspecialchars($office['name']); ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
               </div>
 
-              <div class="form-group row">
-                <div class="col-sm-12 text-end">
-                  <button type="button" class="btn btn-cancel me-2">Cancel</button>
-                  <button type="submit" class="btn btn-submit">Request</button>
-                </div>
+              <div class="text-end">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
               </div>
             </form>
           </div>
@@ -441,7 +443,7 @@ foreach ($offices as $office) {
         });
       });
 
-      $('#requestDocumentForm').on('submit', function (e) {
+      $('#documentRequestForm').on('submit', function (e) {
         e.preventDefault(); // Prevent the default form submission
         const form = $(this);
         $.post(form.attr('action'), form.serialize(), function (response) {
@@ -466,7 +468,7 @@ foreach ($offices as $office) {
               title: 'Success',
               text: 'Document requested successfully!'
             });
-            $('#requestDocumentForm')[0].reset();
+            $('#documentRequestForm')[0].reset();
           } else {
             Swal.fire({
               icon: 'error',
