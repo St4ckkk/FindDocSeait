@@ -25,8 +25,10 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
     <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
     <link href="assets/css/global.css" rel="stylesheet">
+    <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
     <style>
         .modal-dialog-centered {
             display: flex;
@@ -108,6 +110,7 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                                 <td><?php echo htmlspecialchars($document['created_at']); ?></td>
                                 <td>
                                     <button class="btn btn-receive"
+                                        data-id="<?php echo htmlspecialchars($document['id']); ?>"
                                         data-details="<?php echo htmlspecialchars($document['details']); ?>"
                                         data-from="<?php echo htmlspecialchars($document['submitted_by_name']); ?>"
                                         data-type="<?php echo htmlspecialchars($document['document_type']); ?>"
@@ -194,6 +197,7 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
             document.querySelectorAll('.btn-receive').forEach(button => {
                 button.addEventListener('click', function () {
                     // Get data from button attributes
+                    const documentId = this.getAttribute('data-id');
                     const details = this.getAttribute('data-details');
                     const from = this.getAttribute('data-from');
                     const type = this.getAttribute('data-type');
@@ -209,6 +213,9 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                     document.getElementById('acceptedBy').value = '<?php echo $_SESSION['fullname']; ?>'; // Dynamic based on logged-in user
                     document.getElementById('documentPreview').src = 'process/preview_document.php?path=' + encodeURIComponent(path);
 
+                    // Store document ID for later use
+                    document.getElementById('acceptDocumentBtn').setAttribute('data-id', documentId);
+
                     // Show modal
                     receiveModal.show();
                 });
@@ -216,8 +223,43 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
 
             // Handle accept document button
             document.getElementById('acceptDocumentBtn').addEventListener('click', function () {
-                // Add your document acceptance logic here
-                alert('Document accepted successfully!');
+                const documentId = this.getAttribute('data-id');
+
+                // Send AJAX request to update document status
+                fetch('process/accept_document.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `document_id=${documentId}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Document accepted successfully!'
+                            }).then(() => {
+                                location.reload(); // Reload the page to reflect changes
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to accept document: ' + data.message
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while accepting the document.'
+                        });
+                    });
+
                 receiveModal.hide();
             });
         });

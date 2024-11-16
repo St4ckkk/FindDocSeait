@@ -6,6 +6,9 @@ include_once '../../core/documentController.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $documentController = new documentController();
 
+    // Generate a unique tracking number
+    $tracking_number = 'TRK-' . time() . '-' . rand(1000, 9999);
+
     $params = [
         'by' => $_SESSION['user_id'], // Ensure this is the correct user ID
         'office_id' => $_SESSION['office_id'],
@@ -14,7 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'purpose' => $_POST['purpose'],
         'to' => $_POST['office'],
         'document_path' => '', // This will be updated after file upload
-        'status' => 'submitted'
+        'status' => 'submitted',
+        'tracking_number' => $tracking_number
     ];
 
     // Handle file upload
