@@ -4,10 +4,10 @@ include_once '../includes/header.php';
 include_once '../includes/sidebar.php';
 include_once '../core/userController.php';
 // Check if the user is logged in
-if (!isset($_SESSION['user_name'])) {
-  header("Location: ../login.php");
-  exit();
-}
+// if (!isset($_SESSION['user_name'])) {
+//   header("Location: ../login.php");
+//   exit();
+// }
 
 $userController = new userController();
 $offices = $userController->getOffices();

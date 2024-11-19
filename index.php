@@ -15,184 +15,222 @@
     <script src="views/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-    <style>
-        body {
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            background: none;
-            color: #444444;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.3)),
-                url('assets/img/seait-logo.png') no-repeat center center fixed;
-            background-size: cover;
-            filter: blur(5px);
-            z-index: -1;
-            opacity: 0.9;
-        }
-
-        .logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .logo img {
-            width: 100px;
-            animation: spin 5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotateY(0deg);
-            }
-
-            100% {
-                transform: rotateY(360deg);
-            }
-        }
-
-        .header {
-            background: rgb(226, 123, 24);
-            padding: 15px 20px;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1;
-        }
-
-        .logo-text {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 5px;
-        }
-
-        .search-bar input {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-        }
-
-        .search-bar button {
-            padding: 5px 15px;
-            background: white;
-            border: none;
-            border-radius: 3px;
-            color: #333;
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding-top: 60px;
-            /* Adjust for header height */
-        }
-
-        .login-panel {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        .form-title {
-            color: #333;
-            font-size: 16px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgb(226, 123, 24);
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            color: #333;
-            font-size: 14px;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 14px;
-        }
-
-        .g-recaptcha {
-            transform: scale(0.9);
-            transform-origin: 0 0;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 6px 20px;
-            border-radius: 3px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background: #f1f1f1;
-            color: #333;
-        }
-
-        .btn-submit {
-            background: rgb(226, 123, 24);
-            color: white;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .register-link a {
-            color: rgb(226, 123, 24);
-            text-decoration: none;
-        }
-
-        .swal2-container {
-            z-index: 9999;
-        }
-    </style>
 </head>
+<style>
+    body {
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        background: none;
+        color: #444444;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.3)),
+            url('assets/img/seait-logo.png') no-repeat center center fixed;
+        background-size: cover;
+        filter: blur(5px);
+        z-index: -1;
+        opacity: 0.9;
+    }
+
+    .logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .logo img {
+        width: 100px;
+        animation: spinY 5s linear infinite;
+    }
+
+    @keyframes spinY {
+        0% {
+            transform: rotateY(0deg);
+        }
+
+        100% {
+            transform: rotateY(360deg);
+        }
+    }
+
+
+    .header {
+        background: rgb(226, 123, 24);
+        padding: 15px 20px;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1;
+    }
+
+    .logo-text {
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 5px;
+    }
+
+    .search-bar input {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+    }
+
+    .search-bar button {
+        padding: 5px 15px;
+        background: white;
+        border: none;
+        border-radius: 3px;
+        color: #333;
+    }
+
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding-top: 60px;
+        /* Adjust for header height */
+    }
+
+    .login-panel {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 300px;
+    }
+
+    .form-title {
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgb(226, 123, 24);
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        color: #333;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .g-recaptcha {
+        transform: scale(0.9);
+        transform-origin: 0 0;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 6px 20px;
+        border-radius: 3px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: #f1f1f1;
+        color: #333;
+    }
+
+    .btn-submit {
+        background: rgb(226, 123, 24);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: rgb(226, 123, 24);
+    }
+
+    .btn-passkey {
+        background-color: #f6f8fa;
+        border: 1px solid rgba(27, 31, 35, 0.15);
+        color: #24292e;
+    }
+
+    .btn-passkey:hover {
+        background-color: #e1e4e8;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .register-link a {
+        color: rgb(226, 123, 24);
+        text-decoration: none;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid gray;
+    }
+
+    .divider:not(:empty)::before {
+        margin-right: 1em;
+    }
+
+    .divider:not(:empty)::after {
+        margin-left: 1em;
+    }
+
+    .swal2-container {
+        z-index: 9999;
+    }
+</style>
 
 <body>
     <header class="header">
@@ -220,7 +258,8 @@
                     <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
                 <div class="form-group">
-                    <div class="g-recaptcha" data-sitekey="6Lez8oAqAAAAACcrcb3hCsT3zJgU-R7r0MqeQuY0"></div>
+                    <!-- Fixed reCAPTCHA div - removed id attribute -->
+                    <div class="g-recaptcha" data-sitekey="6LdjcIMqAAAAANy9mqljGZhmNpJjfvBYM7s7N6jP"></div>
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-submit w-100">Sign in</button>
@@ -229,6 +268,10 @@
                     <p>Don't have an account? <a href="registration_page.php" class="btn btn-register">Register</a></p>
                 </div>
             </form>
+            <div class="divider">or</div>
+            <div class="button-group mt-3">
+                <button id="passkeyLoginBtn" class="btn btn-passkey w-100">Login with Passkey</button>
+            </div>
         </div>
     </div>
 
@@ -257,13 +300,102 @@
         </div>
     </div>
 
+    <!-- Passkey Modal -->
+    <div class="modal fade" id="passkeyModal" tabindex="-1" aria-labelledby="passkeyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passkeyModalLabel">Enter Passkey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passkeyForm">
+                        <div class="form-group">
+                            <label class="form-label">Passkey</label>
+                            <input type="text" class="form-control" name="passkey" id="passkeyInput"
+                                placeholder="Enter Passkey" required>
+                        </div>
+                        <div class="button-group mt-3">
+                            <button type="submit" class="btn btn-submit w-100">Verify Passkey</button>
+                        </div>
+                    </form>
+                    <button id="getPasskeyBtn" class="btn btn-info mt-3 w-100">Email Passkey</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Enter Your Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="emailForm">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="emailInput"
+                                placeholder="Enter your email" required>
+                        </div>
+                        <div class="button-group mt-3">
+                            <button type="submit" class="btn btn-submit w-100">Submit</button>
+                        </div>
+                    </form>
+                    <div id="loader" class="loader" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
     <script>
         $(document).ready(function () {
+            function resetRecaptcha() {
+                grecaptcha.reset();
+            }
+
             $('#loginForm').on('submit', function (e) {
-                e.preventDefault(); // Prevent the default form submission
+                e.preventDefault();
 
-                const formData = $(this).serialize();
+                // Fixed reCAPTCHA response retrieval
+                const recaptchaResponse = grecaptcha.getResponse();
+                if (!recaptchaResponse) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please complete the reCAPTCHA verification.',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
 
+                const formData = $(this).serialize() + '&g-recaptcha-response=' + recaptchaResponse;
+
+                // [Rest of the Ajax call remains the same]
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
@@ -271,7 +403,7 @@
                     dataType: 'json',
                     success: function (response) {
                         if (response.status === 'otp_required') {
-                            $('#otpModal').modal('show'); // Show OTP modal
+                            $('#otpModal').modal('show');
                         } else if (response.status === 'success') {
                             Swal.fire({
                                 icon: 'success',
@@ -281,7 +413,7 @@
                                 showConfirmButton: true
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = 'views/dashboard.php'; // Redirect to dashboard
+                                    window.location.href = 'views/dashboard.php';
                                 }
                             });
                         } else {
@@ -292,21 +424,24 @@
                                 confirmButtonColor: '#d33'
                             });
                         }
+                        resetRecaptcha();
                     },
                     error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'Connection Error',
                             text: 'Failed to connect to the server. Please try again.',
                             confirmButtonColor: '#d33'
                         });
+                        resetRecaptcha();
                     }
                 });
             });
-
             $('#otpForm').on('submit', function (e) {
-                e.preventDefault(); // Prevent the default form submission
+                e.preventDefault();
 
                 const formData = $(this).serialize();
 
@@ -325,7 +460,7 @@
                                 showConfirmButton: true
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = 'views/dashboard.php'; // Redirect to dashboard
+                                    window.location.href = 'views/dashboard.php';
                                 }
                             });
                         } else {
@@ -338,7 +473,9 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'Connection Error',
@@ -357,12 +494,13 @@
                     dataType: 'json',
                     success: function (response) {
                         if (response.status === 'success') {
-                            $('#otpInput').val(response.otp); // Automatically populate the OTP field
                             Swal.fire({
                                 icon: 'info',
-                                title: 'OTP',
+                                title: 'Your OTP',
                                 text: 'Your OTP is: ' + response.otp,
                                 confirmButtonColor: '#3085d6'
+                            }).then(() => {
+                                $('#otpInput').val(response.otp);
                             });
                         } else {
                             Swal.fire({
@@ -374,7 +512,9 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error('AJAX Error:', error);
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'Connection Error',
@@ -384,9 +524,114 @@
                     }
                 });
             });
+
+            $('#passkeyLoginBtn').on('click', function () {
+                $('#passkeyModal').modal('show');
+            });
+
+            $('#passkeyForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: 'login_passkey.php',
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Passkey verified successfully!',
+                                allowOutsideClick: false,
+                                showConfirmButton: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'views/dashboard.php';
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Invalid Passkey',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Failed to connect to the server. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            });
+
+            $('#getPasskeyBtn').on('click', function () {
+                $('#emailModal').modal('show');
+            });
+
+            $('#emailForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const email = $('#emailInput').val();
+                $('#loader').show(); // Show loader
+
+                $.ajax({
+                    url: 'send_passkey.php',
+                    type: 'POST',
+                    data: { email: email },
+                    dataType: 'json',
+                    success: function (response) {
+                        $('#loader').hide(); // Hide loader
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Passkey',
+                                text: 'Your passkey has been emailed to you.',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to email passkey',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                        $('#emailModal').modal('hide');
+                        $('.btn-close').focus(); // Move focus to another element
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        $('#loader').hide(); // Hide loader
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Failed to connect to the server. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                        $('#emailModal').modal('hide');
+                        $('.btn-close').focus(); // Move focus to another element
+                    }
+                });
+            });
+
         });
     </script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
+
+</html>
 
 </html>

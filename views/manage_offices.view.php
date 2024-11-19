@@ -155,7 +155,7 @@
     </main>
 
     <!-- Add Office Modal -->
-    <div class="modal fade" id="addOfficeModal" tabindex="-1">
+    <div class="modal fade" id="addOfficeModal" tabindex="-1" inert>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -180,7 +180,7 @@
     </div>
 
     <!-- Add Admin Modal -->
-    <div class="modal fade" id="addAdminModal" tabindex="-1">
+    <div class="modal fade" id="addAdminModal" tabindex="-1" inert>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -353,6 +353,24 @@
                         text: 'AJAX request failed: ' + error
                     });
                 });
+            });
+
+            const addAdminModal = document.getElementById('addAdminModal');
+            addAdminModal.addEventListener('show.bs.modal', function () {
+                addAdminModal.removeAttribute('inert');
+            });
+
+            addAdminModal.addEventListener('hidden.bs.modal', function () {
+                addAdminModal.setAttribute('inert', '');
+            });
+
+            const addOfficeModal = document.getElementById('addOfficeModal');
+            addOfficeModal.addEventListener('show.bs.modal', function () {
+                addOfficeModal.removeAttribute('inert');
+            });
+
+            addOfficeModal.addEventListener('hidden.bs.modal', function () {
+                addOfficeModal.setAttribute('inert', '');
             });
         });
     </script>
