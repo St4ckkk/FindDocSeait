@@ -64,7 +64,7 @@ if (isset($_GET['path'])) {
                 if (!isset($_SESSION['authorized'])) {
                     // Set the font, color, and position for the watermark
                     $pdf->SetFont('Helvetica', 'B', 40);
-                    $pdf->SetTextColor(200, 200, 200); // Light gray color to simulate transparency
+                    $pdf->SetTextColor(226, 123, 24); // Light gray color to simulate transparency
 
                     // Apply transformation for rotation and add multiple watermarks
                     for ($x = 0; $x < $size['width']; $x += 100) {
@@ -77,7 +77,29 @@ if (isset($_GET['path'])) {
                             }
                         }
                     }
+
+                    // Add logo as watermark
+                    $logoPath = '../assets/img/seait-logo.png'; // Path to your logo image
+                    $logoWidth = 50; // Width of the logo
+                    $logoHeight = 50; // Height of the logo
+                    for ($x = 0; $x < $size['width']; $x += 100) {
+                        for ($y = 0; $y < $size['height']; $y += 100) {
+                            $pdf->Image($logoPath, $x, $y, $logoWidth, $logoHeight);
+                        }
+                    }
                 }
+
+                // Add hidden logo for steganography
+                $logoPath = '../assets/img/seait-logo.png'; // Path to your logo image
+                $logoWidth = 1; // Width of the logo
+                $logoHeight = 1; // Height of the logo
+                // Set transparency to make it less visible
+                for ($x = 0; $x < $size['width']; $x += 100) {
+                    for ($y = 0; $y < $size['height']; $y += 100) {
+                        $pdf->Image($logoPath, $x, $y, $logoWidth, $logoHeight);
+                    }
+                }
+                // Reset transparency
             }
 
             // Output the PDF
