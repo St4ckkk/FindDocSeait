@@ -23,6 +23,30 @@ class userController
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getUsersByOffice($office_id)
+    {
+        $query = "SELECT users.*, roles.role_name 
+                  FROM users 
+                  JOIN roles ON users.role_id = roles.role_id 
+                  WHERE users.office_id = :office_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':office_id', $office_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserRole($id)
+    {
+        $query = "SELECT roles.role_name 
+                  FROM users 
+                  JOIN roles ON users.role_id = roles.role_id 
+                  WHERE users.id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['role_name'];
+    }
+
     public function addAdmin($params)
     {
         // Check if the username or email already exists
