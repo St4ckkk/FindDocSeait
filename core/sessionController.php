@@ -28,6 +28,7 @@ class sessionController
             if ($user && password_verify($password, $user['password'])) {
                 session_start();
                 $_SESSION['user_id'] = $user['id'];
+                $_SESSION['authorized'] = $user['id'];
                 $_SESSION['user_name'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
                 $_SESSION['fullname'] = $user['fullname'];

@@ -1,16 +1,17 @@
 <?php
 include_once 'Database.php';
 
+
 class documentController
 {
     private $db;
+
 
     public function __construct()
     {
         $database = new Database();
         $this->db = $database->getConnection();
     }
-
     public function submitDocument($params)
     {
         $query = "INSERT INTO documents (submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, tracking_number) 
@@ -76,8 +77,8 @@ class documentController
 
     private function logDocumentChange($tracking_number, $title, $message)
     {
-        $query = "INSERT INTO tracking_logs (tracking_number, submitted_by, office_id, document_type, details, purpose, recipient_office_id, recipient_general_id, document_path, status, title, message, created_at, updated_at)
-              SELECT tracking_number, submitted_by, office_id, document_type, details, purpose, recipient_office_id, recipient_general_id, document_path, status, :title, :message, created_at, updated_at
+        $query = "INSERT INTO tracking_logs (tracking_number, submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, title, message, created_at, updated_at)
+              SELECT tracking_number, submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, :title, :message, created_at, updated_at
               FROM documents WHERE tracking_number = :tracking_number";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':tracking_number', $tracking_number);

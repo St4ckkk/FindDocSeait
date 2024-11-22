@@ -187,16 +187,12 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
     <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize DataTable
             new simpleDatatables.DataTable("#example");
 
-            // Initialize modal
             const receiveModal = new bootstrap.Modal(document.getElementById('receiveDocumentModal'));
 
-            // Add click event listeners to all receive buttons
             document.querySelectorAll('.btn-receive').forEach(button => {
                 button.addEventListener('click', function () {
-                    // Get data from button attributes
                     const documentId = this.getAttribute('data-id');
                     const details = this.getAttribute('data-details');
                     const from = this.getAttribute('data-from');
@@ -205,27 +201,24 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                     const path = this.getAttribute('data-path');
                     const filename = this.getAttribute('data-filename');
 
-                    // Populate modal fields
+                    console.log("File path: " + path); // Debugging statement
+
                     document.getElementById('senderName').textContent = from;
                     document.getElementById('documentType').value = type;
                     document.getElementById('documentDetails').value = details;
                     document.getElementById('actionsNeeded').value = actions;
-                    document.getElementById('acceptedBy').value = '<?php echo $_SESSION['fullname']; ?>'; // Dynamic based on logged-in user
+                    document.getElementById('acceptedBy').value = '<?php echo $_SESSION['fullname']; ?>';
                     document.getElementById('documentPreview').src = 'process/preview_document.php?path=' + encodeURIComponent(path);
 
-                    // Store document ID for later use
                     document.getElementById('acceptDocumentBtn').setAttribute('data-id', documentId);
 
-                    // Show modal
                     receiveModal.show();
                 });
             });
 
-            // Handle accept document button
             document.getElementById('acceptDocumentBtn').addEventListener('click', function () {
                 const documentId = this.getAttribute('data-id');
 
-                // Send AJAX request to update document status
                 fetch('process/accept_document.php', {
                     method: 'POST',
                     headers: {
@@ -241,7 +234,7 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                                 title: 'Success',
                                 text: 'Document accepted successfully!'
                             }).then(() => {
-                                location.reload(); // Reload the page to reflect changes
+                                location.reload();
                             });
                         } else {
                             Swal.fire({
@@ -267,15 +260,12 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
     <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="assets/vendor/chart.js/chart.umd.js"></script>
     <script src="assets/vendor/echarts/echarts.min.js"></script>
     <script src="assets/vendor/quill/quill.js"></script>
     <script src="assets/vendor/tinymce/tinymce.min.js"></script>
     <script src="assets/vendor/php-email-form/validate.js"></script>
-
-    <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
 </body>
 
