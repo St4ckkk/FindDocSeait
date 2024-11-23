@@ -59,47 +59,43 @@ if (isset($_GET['path'])) {
                 $templateId = $pdf->importPage($pageNo);
                 $size = $pdf->getTemplateSize($templateId);
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+
+                if (isset($_SESSION['authorized'])) {
+                    // Add centered watermark before the page content
+                    $pdf->SetFont('Helvetica', 'B', 100);
+                    $pdf->SetTextColor(200, 200, 200); // Light orange with alpha
+
+                    // Calculate center position
+                    $watermarkText = 'SEAIT';
+                    $textWidth = $pdf->GetStringWidth($watermarkText);
+                    $centerX = ($size['width'] - $textWidth) / 2;
+                    $centerY = $size['height'] / 2;
+
+                    // Add diagonal watermark text in center
+                    $pdf->Rotate(45, $centerX + ($textWidth / 2), $centerY);
+                    $pdf->Text($centerX, $centerY, $watermarkText);
+                    $pdf->Rotate(0);
+
+                    // Add centered logo watermark
+                    // $logoPath = '../assets/img/seait-logo.png';
+                    // $logoWidth = 100;
+                    // $logoHeight = 100;
+                    // $logoX = ($size['width'] - $logoWidth) / 2;
+                    // $logoY = ($size['height'] - $logoHeight) / 2;
+                    // $pdf->Image($logoPath, $logoX, $logoY, $logoWidth, $logoHeight);
+                }
+
+                // Now add the page content on top
                 $pdf->useTemplate($templateId);
 
-                if (!isset($_SESSION['authorized'])) {
-                    // Set the font, color, and position for the watermark
-                    $pdf->SetFont('Helvetica', 'B', 40);
-                    $pdf->SetTextColor(226, 123, 24); // Light gray color to simulate transparency
-
-                    // Apply transformation for rotation and add multiple watermarks
-                    for ($x = 0; $x < $size['width']; $x += 100) {
-                        for ($y = 0; $y < $size['height']; $y += 100) {
-                            for ($i = 0; $i < 5; $i++) { // Overlay text multiple times to simulate blur
-                                $pdf->Rotate(45, $x + 50, $y + 50);
-                                $pdf->SetXY($x + $i, $y + $i);
-                                $pdf->Text($x, $y, 'SEAIT PROPERTY');
-                                $pdf->Rotate(0); // Reset rotation
-                            }
-                        }
-                    }
-
-                    // Add logo as watermark
-                    $logoPath = '../assets/img/seait-logo.png'; // Path to your logo image
-                    $logoWidth = 50; // Width of the logo
-                    $logoHeight = 50; // Height of the logo
-                    for ($x = 0; $x < $size['width']; $x += 100) {
-                        for ($y = 0; $y < $size['height']; $y += 100) {
-                            $pdf->Image($logoPath, $x, $y, $logoWidth, $logoHeight);
-                        }
-                    }
-                }
-
-                // Add hidden logo for steganography
-                $logoPath = '../assets/img/seait-logo.png'; // Path to your logo image
-                $logoWidth = 1; // Width of the logo
-                $logoHeight = 1; // Height of the logo
-                // Set transparency to make it less visible
+                // Add hidden steganographic logo
+                $logoPath = '../assets/img/seait-logo.png';
+                $miniLogoSize = 1;
                 for ($x = 0; $x < $size['width']; $x += 100) {
                     for ($y = 0; $y < $size['height']; $y += 100) {
-                        $pdf->Image($logoPath, $x, $y, $logoWidth, $logoHeight);
+                        $pdf->Image($logoPath, $x, $y, $miniLogoSize, $miniLogoSize);
                     }
                 }
-                // Reset transparency
             }
 
             // Output the PDF
@@ -112,7 +108,6 @@ if (isset($_GET['path'])) {
     } elseif ($fileType === 'docx') {
         error_log('Debug: Processing DOCX file');
         try {
-            // Load and convert Word documents to HTML
             $phpWord = IOFactory::load($filePath);
             $htmlWriter = IOFactory::createWriter($phpWord, 'HTML');
             ob_start();
