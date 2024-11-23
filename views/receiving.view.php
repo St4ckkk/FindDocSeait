@@ -45,6 +45,68 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
             width: 100%;
             height: 500px;
         }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-view,
+        .btn-edit,
+        .btn-delete,
+        .btn-receive {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-view {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* .btn-receive {
+            background-color: #28a745;
+            color: white;
+        } */
+
+        .editor-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+        }
+
+        #documentEditor {
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .edit-controls {
+            padding: 10px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .edit-controls button {
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -119,7 +181,12 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                                         data-filename="<?php echo htmlspecialchars(basename($document['document_path'])); ?>">
                                         Receive
                                     </button>
+                                    <!-- <button class="btn btn-edit" data-id="<?php echo htmlspecialchars($document['id']); ?>"
+                                        data-path="<?php echo htmlspecialchars($document['document_path']); ?>">
+                                        Edit
+                                    </button> -->
                                 </td>
+
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -182,9 +249,93 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
         </div>
     </div>
 
+
     <!-- Add new script for modal functionality -->
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var quill = new Quill('#documentEditor', {
+                theme: 'snow'
+            });
+
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', function () {
+                    const documentId = this.getAttribute('data-id');
+
+                    fetch(`process/get_document_content.php?id=${documentId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Response Data:", data); // Log the response data
+                            if (data.status === 'success') {
+                                quill.clipboard.dangerouslyPasteHTML(data.content);
+                                document.getElementById('saveChanges').setAttribute('data-id', documentId);
+                                document.getElementById('finalSaveChanges').setAttribute('data-id', documentId);
+                                new bootstrap.Modal(document.getElementById('editDocumentModal')).show();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Failed to load document content: ' + data.message
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while loading the document content.'
+                            });
+                        });
+                });
+            });
+
+            document.getElementById('saveChanges').addEventListener('click', function () {
+                const documentId = this.getAttribute('data-id');
+                const content = quill.root.innerHTML;
+
+                console.log("Saving Document ID:", documentId); // Log the document ID being saved
+                console.log("Saving Content:", content); // Log the content being saved
+
+                fetch('process/save_document_content.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ document_id: documentId, content: content })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Save Response Data:", data); // Log the save response data
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Document saved successfully!'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to save document: ' + data.message
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while saving the document.'
+                        });
+                    });
+            });
+
+            document.getElementById('finalSaveChanges').addEventListener('click', function () {
+                document.getElementById('saveChanges').click();
+                new bootstrap.Modal(document.getElementById('editDocumentModal')).hide();
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             new simpleDatatables.DataTable("#example");
@@ -259,7 +410,8 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
     </script>
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
-
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="assets/vendor/chart.js/chart.umd.js"></script>
     <script src="assets/vendor/echarts/echarts.min.js"></script>

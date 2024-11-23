@@ -101,7 +101,6 @@ class userController
         }
     }
 
-
     public function getUserAssignedOffice($office_id)
     {
         $query = "SELECT users.*, roles.role_name 
@@ -114,7 +113,6 @@ class userController
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
     public function getOffices()
     {
         $query = "SELECT * FROM offices";
@@ -122,4 +120,37 @@ class userController
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getAllUsers()
+    {
+        $query = "SELECT users.*, roles.role_name 
+                  FROM users 
+                  JOIN roles ON users.role_id = roles.role_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllRoles()
+    {
+        $query = "SELECT * FROM roles";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    public function getUserPermissions($user_id)
+    {
+        $query = "SELECT permission FROM user_permissions WHERE user_id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        $permissions = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $permissions[] = $row['permission'];
+        }
+        return $permissions;
+    }
+
 }

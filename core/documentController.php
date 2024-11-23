@@ -1,17 +1,16 @@
 <?php
 include_once 'Database.php';
 
-
 class documentController
 {
     private $db;
-
 
     public function __construct()
     {
         $database = new Database();
         $this->db = $database->getConnection();
     }
+
     public function submitDocument($params)
     {
         $query = "INSERT INTO documents (submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, tracking_number) 
@@ -147,5 +146,75 @@ class documentController
 
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $documents;
+    }
+
+    public function getDocumentPathById($document_id)
+    {
+        $query = "SELECT document_path FROM documents WHERE id = :document_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':document_id', $document_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['document_path'];
+    }
+
+    public function saveUserPermissions($user_id, $permissions)
+    {
+        // Delete existing permissions
+        $query = "DELETE FROM user_permissions WHERE user_id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+
+        // Insert new permissions
+        $query = "INSERT INTO user_permissions (user_id, permission) VALUES (:user_id, :permission)";
+        $stmt = $this->db->prepare($query);
+        foreach ($permissions as $permission) {
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':permission', $permission);
+            $stmt->execute();
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function shareDocument($document_id, $office_id)
+    {
+        $query = "UPDATE documents SET share_with = :office_id WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $document_id);
+        $stmt->bindParam(':office_id', $office_id);
+
+        if ($stmt->execute()) {
+            return ['status' => 'success'];
+        } else {
+            $errorInfo = $stmt->errorInfo();
+            error_log('Database error: ' . print_r($errorInfo, true));
+            return ['status' => 'error', 'message' => 'Failed to share document'];
+        }
+    }
+
+    public function deleteDocument($document_id)
+    {
+        $query = "DELETE FROM documents WHERE id = :document_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':document_id', $document_id);
+
+        if ($stmt->execute()) {
+            return ['status' => 'success'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to delete document'];
+        }
+    }
+
+    public function viewDocument($document_id)
+    {
+        $query = "SELECT * FROM documents WHERE id = :document_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':document_id', $document_id);
+        $stmt->execute();
+
+        $document = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $document;
     }
 }
