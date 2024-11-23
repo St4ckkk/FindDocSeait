@@ -60,30 +60,28 @@ if (isset($_GET['path'])) {
                 $size = $pdf->getTemplateSize($templateId);
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
 
-                if (isset($_SESSION['authorized'])) {
-                    // Add centered watermark before the page content
-                    $pdf->SetFont('Helvetica', 'B', 100);
-                    $pdf->SetTextColor(200, 200, 200); // Light orange with alpha
+                // Add centered watermark before the page content
+                $pdf->SetFont('Helvetica', 'B', 100);
+                $pdf->SetTextColor(200, 200, 200); // Light orange with alpha
 
-                    // Calculate center position
-                    $watermarkText = 'SEAIT';
-                    $textWidth = $pdf->GetStringWidth($watermarkText);
-                    $centerX = ($size['width'] - $textWidth) / 2;
-                    $centerY = $size['height'] / 2;
+                // Calculate center position
+                $watermarkText = 'SEAIT';
+                $textWidth = $pdf->GetStringWidth($watermarkText);
+                $centerX = ($size['width'] - $textWidth) / 2;
+                $centerY = $size['height'] / 2;
 
-                    // Add diagonal watermark text in center
-                    $pdf->Rotate(45, $centerX + ($textWidth / 2), $centerY);
-                    $pdf->Text($centerX, $centerY, $watermarkText);
-                    $pdf->Rotate(0);
+                // Add diagonal watermark text in center
+                $pdf->Rotate(45, $centerX + ($textWidth / 2), $centerY);
+                $pdf->Text($centerX, $centerY, $watermarkText);
+                $pdf->Rotate(0);
 
-                    // Add centered logo watermark
-                    // $logoPath = '../assets/img/seait-logo.png';
-                    // $logoWidth = 100;
-                    // $logoHeight = 100;
-                    // $logoX = ($size['width'] - $logoWidth) / 2;
-                    // $logoY = ($size['height'] - $logoHeight) / 2;
-                    // $pdf->Image($logoPath, $logoX, $logoY, $logoWidth, $logoHeight);
-                }
+                // Add centered logo watermark
+                // $logoPath = '../assets/img/seait-logo.png';
+                // $logoWidth = 100;
+                // $logoHeight = 100;
+                // $logoX = ($size['width'] - $logoWidth) / 2;
+                // $logoY = ($size['height'] - $logoHeight) / 2;
+                // $pdf->Image($logoPath, $logoX, $logoY, $logoWidth, $logoHeight);
 
                 // Now add the page content on top
                 $pdf->useTemplate($templateId);
