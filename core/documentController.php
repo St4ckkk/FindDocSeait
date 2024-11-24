@@ -47,26 +47,6 @@ class documentController
         }
     }
 
-    public function acceptDocument($document_id, $status, $csrfToken)
-    {
-        if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
-        }
-
-        $query = "UPDATE documents SET status = :status WHERE id = :document_id";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':status', $status);
-        $stmt->bindParam(':document_id', $document_id);
-
-        if ($stmt->execute()) {
-            $tracking_number = $this->getTrackingNumberById($document_id);
-            $office_name = $this->getOfficeNameByDocumentId($document_id);
-            $this->logDocumentChange($tracking_number, 'Request Approved', "Document request reviewed and approved by the $office_name");
-            return ['status' => 'success'];
-        } else {
-            return ['status' => 'error', 'message' => 'Failed to update document status'];
-        }
-    }
 
     private function getTrackingNumberById($document_id)
     {
@@ -148,40 +128,73 @@ class documentController
         return $logs;
     }
 
-    public function getSubmittedDocuments($office_id, $csrfToken)
+    public function acceptDocument($document_id, $status, $csrfToken, $accepted_by)
     {
-
         if (!$this->verifyCsrfToken($csrfToken)) {
             return ['status' => 'error', 'message' => 'Invalid CSRF token'];
         }
 
-        $query = "SELECT documents.*, users.fullname AS submitted_by_name 
-                  FROM documents 
-                  JOIN users ON documents.submitted_by = users.id 
-                  WHERE documents.office_id = :office_id AND documents.status = 'submitted'";
+        $query = "UPDATE documents SET status = :status, accepted_by = :accepted_by WHERE id = :document_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':accepted_by', $accepted_by);
+        $stmt->bindParam(':document_id', $document_id);
+
+        if ($stmt->execute()) {
+            $tracking_number = $this->getTrackingNumberById($document_id);
+            $office_name = $this->getOfficeNameByDocumentId($document_id);
+            $this->logDocumentChange($tracking_number, 'Request Approved', "Document request reviewed and approved by the $office_name");
+            return ['status' => 'success'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to update document status'];
+        }
+    }
+
+    public function getSubmittedDocuments($office_id, $csrfToken)
+    {
+        // Verify the CSRF token
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
+        // Prepare the SQL query to fetch submitted documents for the given recipient_office_id
+        $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
+              FROM documents 
+              JOIN users ON documents.submitted_by = users.id 
+              JOIN offices ON documents.recipient_office_id = offices.office_id 
+              WHERE documents.recipient_office_id = :office_id AND documents.status = 'submitted'";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':office_id', $office_id);
         $stmt->execute();
 
+        // Fetch and return the documents
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $documents;
     }
 
     public function getPendingDocuments($office_id, $csrfToken)
     {
-
+        // Verify the CSRF token
         if (!$this->verifyCsrfToken($csrfToken)) {
             return ['status' => 'error', 'message' => 'Invalid CSRF token'];
         }
 
-        $query = "SELECT documents.*, users.fullname AS submitted_by_name 
-                  FROM documents 
-                  JOIN users ON documents.submitted_by = users.id 
-                  WHERE documents.office_id = :office_id AND documents.status = 'pending'";
+        // Prepare the SQL query to fetch pending documents for the given office_id
+        $query = "SELECT documents.*, 
+                     users.fullname AS submitted_by_name, 
+                     offices.name AS office_name,
+                     accepted_users.fullname AS accepted_by_name
+              FROM documents 
+              JOIN users ON documents.submitted_by = users.id 
+              JOIN offices ON documents.recipient_office_id = offices.office_id
+              LEFT JOIN users AS accepted_users ON documents.accepted_by = accepted_users.id
+              WHERE (documents.recipient_office_id = :office_id OR documents.office_id = :office_id) 
+              AND documents.status = 'pending'";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':office_id', $office_id);
         $stmt->execute();
 
+        // Fetch and return the documents
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $documents;
     }

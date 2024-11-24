@@ -17,7 +17,7 @@ try {
     error_log("Saving permissions for user ID: " . $user_id . " with permissions: " . json_encode($permissions));
 
     $documentController = new documentController();
-    $response = $documentController->saveUserPermissions($user_id, $permissions);
+    $response = $documentController->saveUserPermissions($user_id, $permissions, $_SESSION['csrf_token']);
 
     if ($response) {
         echo json_encode(['status' => 'success']);

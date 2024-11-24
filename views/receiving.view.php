@@ -158,7 +158,9 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id'], 
                                                 <td><?php echo htmlspecialchars($document['document_type']); ?></td>
                                                 <td><?php echo htmlspecialchars($document['details']); ?></td>
                                                 <td><?php echo htmlspecialchars($document['submitted_by_name']); ?></td>
-                                                <td><?php echo htmlspecialchars($document['office_id']); ?></td>
+                                                <td>
+                                                    <?php echo htmlspecialchars($document['office_name']); ?>
+                                                </td>
                                                 <td><?php echo htmlspecialchars($document['purpose']); ?></td>
                                                 <td><?php echo htmlspecialchars($document['created_at']); ?></td>
                                                 <td>
@@ -274,7 +276,7 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id'], 
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `document_id=${documentId}`
+                    body: `document_id=${documentId}&accepted_by=<?php echo $_SESSION['user_id']; ?>`
                 })
                     .then(response => response.json())
                     .then(data => {

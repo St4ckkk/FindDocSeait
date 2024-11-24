@@ -96,7 +96,7 @@ $userPermissions = $userController->getUserPermissions($_SESSION['user_id']);
                                                 <td>
                                                     <?php echo htmlspecialchars($document['created_at']); ?><br>
                                                     <small>by:
-                                                        <?php echo htmlspecialchars($_SESSION['fullname']); ?></small>
+                                                        <?php echo htmlspecialchars($document['accepted_by_name']); ?></small>
                                                 </td>
                                                 <td><?php echo htmlspecialchars($document['purpose']); ?></td>
                                                 <td>
