@@ -233,6 +233,7 @@
 </style>
 
 <body>
+
     <header class="header">
         <div class="d-flex justify-content-between align-items-center">
             <div class="logo-text">FindDocSEAIT</div>
@@ -258,7 +259,6 @@
                     <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
                 <div class="form-group">
-                    <!-- Fixed reCAPTCHA div - removed id attribute -->
                     <div class="g-recaptcha" data-sitekey="6LdjcIMqAAAAANy9mqljGZhmNpJjfvBYM7s7N6jP"></div>
                 </div>
                 <div class="button-group">
@@ -271,6 +271,9 @@
             <div class="divider">or</div>
             <div class="button-group mt-3">
                 <button id="passkeyLoginBtn" class="btn btn-passkey w-100">Login with Passkey</button>
+            </div>
+            <div class="button-group mt-3">
+                <button id="generateGoogleAuthBtn" class="btn btn-info w-100">Login using Google Authenticator</button>
             </div>
         </div>
     </div>
@@ -350,27 +353,35 @@
         </div>
     </div>
 
-    <style>
-        .loader {
-            border: 16px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 16px solid #3498db;
-            width: 60px;
-            height: 60px;
-            animation: spin 2s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+    <!-- Google Authenticator Modal -->
+    <div class="modal fade" id="googleAuthModal" tabindex="-1" aria-labelledby="googleAuthModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="googleAuthModalLabel">Google Authenticator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="qrCodeContainer" style="text-align: center; margin-bottom: 20px;"></div>
+                    <form id="googleAuthForm">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Authenticator Code</label>
+                            <input type="text" class="form-control" name="authCode"
+                                placeholder="Enter Authenticator Code" required>
+                        </div>
+                        <div class="button-group mt-3">
+                            <button type="submit" class="btn btn-submit w-100">Verify Code</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         $(document).ready(function () {
@@ -381,7 +392,6 @@
             $('#loginForm').on('submit', function (e) {
                 e.preventDefault();
 
-                // Fixed reCAPTCHA response retrieval
                 const recaptchaResponse = grecaptcha.getResponse();
                 if (!recaptchaResponse) {
                     Swal.fire({
@@ -395,7 +405,6 @@
 
                 const formData = $(this).serialize() + '&g-recaptcha-response=' + recaptchaResponse;
 
-                // [Rest of the Ajax call remains the same]
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
@@ -440,6 +449,7 @@
                     }
                 });
             });
+
             $('#otpForm').on('submit', function (e) {
                 e.preventDefault();
 
@@ -627,11 +637,94 @@
                 });
             });
 
+            $('#googleAuthForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: 'verify_google_auth_login.php',
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Google Authenticator verified successfully!',
+                                allowOutsideClick: false,
+                                showConfirmButton: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'views/dashboard.php';
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Invalid Authenticator Code',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Failed to connect to the server. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            });
+
+            $('#generateGoogleAuthBtn').on('click', function () {
+                $('#googleAuthModal').modal('show');
+                generateGoogleAuthSecret();
+            });
+
+            function generateGoogleAuthSecret() {
+                const email = $('input[name="email"]').val();
+
+                $.ajax({
+                    url: 'generate_google_auth_secret.php',
+                    type: 'POST',
+                    data: { email: email },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#qrCodeContainer').html('<img src="' + response.qrCodeUrl + '" alt="QR Code">');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to generate Google Authenticator secret',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Failed to connect to the server. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            }
         });
     </script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 
-</html>
 
 </html>

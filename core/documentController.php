@@ -11,10 +11,23 @@ class documentController
         $this->db = $database->getConnection();
     }
 
-    public function submitDocument($params)
+    // Verify CSRF token
+    private function verifyCsrfToken($token)
     {
+        if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function submitDocument($params, $csrfToken)
+    {
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "INSERT INTO documents (submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, tracking_number) 
-                  VALUES (:submitted_by, :office_id, :document_type, :details, :purpose, :recipient_office_id, :document_path, :status, :tracking_number)";
+              VALUES (:submitted_by, :office_id, :document_type, :details, :purpose, :recipient_office_id, :document_path, :status, :tracking_number)";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':submitted_by', $params['by']);
         $stmt->bindParam(':office_id', $params['office_id']);
@@ -34,8 +47,12 @@ class documentController
         }
     }
 
-    public function acceptDocument($document_id, $status)
+    public function acceptDocument($document_id, $status, $csrfToken)
     {
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "UPDATE documents SET status = :status WHERE id = :document_id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':status', $status);
@@ -86,8 +103,13 @@ class documentController
         $stmt->execute();
     }
 
-    public function getDocumentByTrackingNumber($tracking_number)
+    public function getDocumentByTrackingNumber($tracking_number, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
                   FROM documents 
                   JOIN users ON documents.submitted_by = users.id 
@@ -107,6 +129,12 @@ class documentController
 
     public function getTrackingLogsByTrackingNumber($tracking_number)
     {
+        $csrfToken = $_SESSION['csrf_token'];
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT tracking_logs.*, offices.name AS office_name 
                   FROM tracking_logs 
                   JOIN offices ON tracking_logs.office_id = offices.office_id 
@@ -120,8 +148,13 @@ class documentController
         return $logs;
     }
 
-    public function getSubmittedDocuments($office_id)
+    public function getSubmittedDocuments($office_id, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT documents.*, users.fullname AS submitted_by_name 
                   FROM documents 
                   JOIN users ON documents.submitted_by = users.id 
@@ -134,8 +167,13 @@ class documentController
         return $documents;
     }
 
-    public function getPendingDocuments($office_id)
+    public function getPendingDocuments($office_id, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT documents.*, users.fullname AS submitted_by_name 
                   FROM documents 
                   JOIN users ON documents.submitted_by = users.id 
@@ -148,8 +186,13 @@ class documentController
         return $documents;
     }
 
-    public function getDocumentPathById($document_id)
+    public function getDocumentPathById($document_id, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT document_path FROM documents WHERE id = :document_id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':document_id', $document_id);
@@ -158,8 +201,13 @@ class documentController
         return $result['document_path'];
     }
 
-    public function saveUserPermissions($user_id, $permissions)
+    public function saveUserPermissions($user_id, $permissions, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         // Delete existing permissions
         $query = "DELETE FROM user_permissions WHERE user_id = :user_id";
         $stmt = $this->db->prepare($query);
@@ -178,8 +226,14 @@ class documentController
         return ['status' => 'success'];
     }
 
-    public function shareDocument($document_id, $office_id)
+
+    public function shareDocument($document_id, $office_id, $csrfToken)
     {
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "UPDATE documents SET share_with = :office_id WHERE id = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $document_id);
@@ -194,8 +248,14 @@ class documentController
         }
     }
 
-    public function deleteDocument($document_id)
+    public function deleteDocument($document_id, $csrfToken)
     {
+        $csrfToken = $_SESSION['csrf_token'];
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "DELETE FROM documents WHERE id = :document_id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':document_id', $document_id);
@@ -207,8 +267,14 @@ class documentController
         }
     }
 
-    public function viewDocument($document_id)
+    public function viewDocument($document_id, $csrfToken)
     {
+        $csrfToken = $_SESSION['csrf_token'];
+
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        }
+
         $query = "SELECT * FROM documents WHERE id = :document_id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':document_id', $document_id);
@@ -218,3 +284,4 @@ class documentController
         return $document;
     }
 }
+?>

@@ -3,8 +3,13 @@ include_once '../core/database.php';
 include_once '../core/documentController.php';
 
 session_start();
+if (!isset($_SESSION['csrf_token'])) {
+    header("Location: ../unauthorized.php");
+    exit();
+}
+
 $documentController = new documentController();
-$documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
+$documents = $documentController->getSubmittedDocuments($_SESSION['office_id'], $_SESSION['csrf_token']);
 ?>
 
 <!DOCTYPE html>
@@ -127,72 +132,57 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
             </nav>
         </div>
 
-        <div class="main-section">
-            <div class="documents-table">
-                <div class="documents-header">
-                    FOR RECEIVING
-                </div>
-                <div class="table-controls-container">
-                    <div class="entries-control">
-                        Show
-                        <select class="form-select form-select-sm">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        entries
-                    </div>
-                    <div class="search-control">
-                        Search:
-                        <input type="text" class="form-control form-control-sm">
-                    </div>
-                </div>
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">DOCUMENTS FOR RECEIVING</h5>
 
-                <table id="example" class="table datatable datatable-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Details</th>
-                            <th>From</th>
-                            <th>School/Office</th>
-                            <th>ACTIONS NEEDED</th>
-                            <th>Date & Time Posted</th>
-                            <th>Receive</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($documents as $document): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($document['document_type']); ?></td>
-                                <td><?php echo htmlspecialchars($document['details']); ?></td>
-                                <td><?php echo htmlspecialchars($document['submitted_by_name']); ?></td>
-                                <td><?php echo htmlspecialchars($document['office_id']); ?></td>
-                                <td><?php echo htmlspecialchars($document['purpose']); ?></td>
-                                <td><?php echo htmlspecialchars($document['created_at']); ?></td>
-                                <td>
-                                    <button class="btn btn-receive"
-                                        data-id="<?php echo htmlspecialchars($document['id']); ?>"
-                                        data-details="<?php echo htmlspecialchars($document['details']); ?>"
-                                        data-from="<?php echo htmlspecialchars($document['submitted_by_name']); ?>"
-                                        data-type="<?php echo htmlspecialchars($document['document_type']); ?>"
-                                        data-actions="<?php echo htmlspecialchars($document['purpose']); ?>"
-                                        data-path="<?php echo htmlspecialchars($document['document_path']); ?>"
-                                        data-filename="<?php echo htmlspecialchars(basename($document['document_path'])); ?>">
-                                        Receive
-                                    </button>
-                                    <!-- <button class="btn btn-edit" data-id="<?php echo htmlspecialchars($document['id']); ?>"
-                                        data-path="<?php echo htmlspecialchars($document['document_path']); ?>">
-                                        Edit
-                                    </button> -->
-                                </td>
-
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                            <div class="table-responsive">
+                                <table id="receiveDocuments" class="table datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Details</th>
+                                            <th>From</th>
+                                            <th>School/Office</th>
+                                            <th>ACTIONS NEEDED</th>
+                                            <th>Date & Time Posted</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($documents as $document): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($document['document_type']); ?></td>
+                                                <td><?php echo htmlspecialchars($document['details']); ?></td>
+                                                <td><?php echo htmlspecialchars($document['submitted_by_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($document['office_id']); ?></td>
+                                                <td><?php echo htmlspecialchars($document['purpose']); ?></td>
+                                                <td><?php echo htmlspecialchars($document['created_at']); ?></td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm btn-receive"
+                                                        data-id="<?php echo htmlspecialchars($document['id']); ?>"
+                                                        data-details="<?php echo htmlspecialchars($document['details']); ?>"
+                                                        data-from="<?php echo htmlspecialchars($document['submitted_by_name']); ?>"
+                                                        data-type="<?php echo htmlspecialchars($document['document_type']); ?>"
+                                                        data-actions="<?php echo htmlspecialchars($document['purpose']); ?>"
+                                                        data-path="<?php echo htmlspecialchars($document['document_path']); ?>"
+                                                        data-filename="<?php echo htmlspecialchars(basename($document['document_path'])); ?>">
+                                                        Receive
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Receive Document Modal -->
@@ -235,10 +225,6 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                                 <input type="text" class="form-control" id="acceptedBy" readonly>
                             </div>
                         </div>
-
-                        <div class="row mb-3 iframe-container">
-                            <iframe id="documentPreview" frameborder="0"></iframe>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -249,96 +235,14 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
         </div>
     </div>
 
-
-    <!-- Add new script for modal functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var quill = new Quill('#documentEditor', {
-                theme: 'snow'
+            new simpleDatatables.DataTable("#receiveDocuments", {
+                searchable: true,
+                fixedHeight: true,
+                perPage: 10,
+                perPageSelect: [10, 25, 50, 100]
             });
-
-            document.querySelectorAll('.btn-edit').forEach(button => {
-                button.addEventListener('click', function () {
-                    const documentId = this.getAttribute('data-id');
-
-                    fetch(`process/get_document_content.php?id=${documentId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Response Data:", data); // Log the response data
-                            if (data.status === 'success') {
-                                quill.clipboard.dangerouslyPasteHTML(data.content);
-                                document.getElementById('saveChanges').setAttribute('data-id', documentId);
-                                document.getElementById('finalSaveChanges').setAttribute('data-id', documentId);
-                                new bootstrap.Modal(document.getElementById('editDocumentModal')).show();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Failed to load document content: ' + data.message
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'An error occurred while loading the document content.'
-                            });
-                        });
-                });
-            });
-
-            document.getElementById('saveChanges').addEventListener('click', function () {
-                const documentId = this.getAttribute('data-id');
-                const content = quill.root.innerHTML;
-
-                console.log("Saving Document ID:", documentId); // Log the document ID being saved
-                console.log("Saving Content:", content); // Log the content being saved
-
-                fetch('process/save_document_content.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ document_id: documentId, content: content })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Save Response Data:", data); // Log the save response data
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'Document saved successfully!'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to save document: ' + data.message
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred while saving the document.'
-                        });
-                    });
-            });
-
-            document.getElementById('finalSaveChanges').addEventListener('click', function () {
-                document.getElementById('saveChanges').click();
-                new bootstrap.Modal(document.getElementById('editDocumentModal')).hide();
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            new simpleDatatables.DataTable("#example");
 
             const receiveModal = new bootstrap.Modal(document.getElementById('receiveDocumentModal'));
 
@@ -349,17 +253,12 @@ $documents = $documentController->getSubmittedDocuments($_SESSION['office_id']);
                     const from = this.getAttribute('data-from');
                     const type = this.getAttribute('data-type');
                     const actions = this.getAttribute('data-actions');
-                    const path = this.getAttribute('data-path');
-                    const filename = this.getAttribute('data-filename');
-
-                    console.log("File path: " + path); // Debugging statement
 
                     document.getElementById('senderName').textContent = from;
                     document.getElementById('documentType').value = type;
                     document.getElementById('documentDetails').value = details;
                     document.getElementById('actionsNeeded').value = actions;
                     document.getElementById('acceptedBy').value = '<?php echo $_SESSION['fullname']; ?>';
-                    document.getElementById('documentPreview').src = 'process/preview_document.php?path=' + encodeURIComponent(path);
 
                     document.getElementById('acceptDocumentBtn').setAttribute('data-id', documentId);
 

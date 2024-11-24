@@ -2,6 +2,11 @@
 include_once '../core/userController.php';
 
 session_start();
+if (!isset($_SESSION['csrf_token'])) {
+    header("Location: ../unauthorized.php");
+    exit();
+}
+
 $userController = new userController();
 $users = $userController->getAllUsers();
 $roles = $userController->getAllRoles();
@@ -156,112 +161,90 @@ $roles = $userController->getAllRoles();
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize DataTable
-            new simpleDatatables.DataTable("#pendingDocuments");
+        $('#permissionsModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var userId = button.data('user-id');
+            var modal = $(this);
 
-            // Handle share button click
-            document.querySelectorAll('.btn-share').forEach(button => {
-                button.addEventListener('click', function () {
-                    const documentId = this.getAttribute('data-id');
-                    document.getElementById('shareDocumentId').value = documentId;
-                    new bootstrap.Modal(document.getElementById('shareDocumentModal')).show();
-                });
-            });
+            // Store the userId in the modal for later use
+            modal.data('user-id', userId);
 
-            // Handle delete button click
-            document.querySelectorAll('.btn-delete').forEach(button => {
-                button.addEventListener('click', function () {
-                    const documentId = this.getAttribute('data-id');
-                    document.getElementById('deleteDocumentId').value = documentId;
-                    new bootstrap.Modal(document.getElementById('deleteDocumentModal')).show();
-                });
-            });
+            // Clear previous permissions
+            modal.find('input[type="checkbox"]').prop('checked', false);
 
-            // Handle share document
-            document.getElementById('shareDocumentBtn').addEventListener('click', function () {
-                const form = document.getElementById('shareDocumentForm');
-                const formData = new FormData(form);
-                fetch('process/share_document.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json().catch(() => {
-                        throw new Error('Invalid JSON response');
-                    }))
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'Document shared successfully!'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to share document: ' + data.message
-                            });
-                        }
-                        new bootstrap.Modal(document.getElementById('shareDocumentModal')).hide();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+            // Fetch existing permissions
+            $.ajax({
+                url: 'process/get_user_permissions.php',
+                method: 'GET',
+                data: { user_id: userId },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        var permissions = response.permissions;
+                        permissions.forEach(function (permission) {
+                            modal.find('input[value="' + permission + '"]').prop('checked', true);
+                        });
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'An error occurred while sharing the document.'
+                            text: response.message || 'Failed to fetch permissions'
                         });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch permissions: ' + error
                     });
+                }
+            });
+        });
+
+        $('#savePermissions').on('click', function () {
+            var modal = $('#permissionsModal');
+            var userId = modal.data('user-id');
+            var permissions = [];
+
+            modal.find('input[type="checkbox"]:checked').each(function () {
+                permissions.push($(this).val());
             });
 
-            // Handle delete document
-            document.getElementById('deleteDocumentBtn').addEventListener('click', function () {
-                const documentId = document.getElementById('deleteDocumentId').value;
-                fetch('process/delete_document.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `document_id=${documentId}`
-                })
-                    .then(response => response.json().catch(() => {
-                        throw new Error('Invalid JSON response');
-                    }))
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'Document deleted successfully!'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to delete document: ' + data.message
-                            });
-                        }
-                        new bootstrap.Modal(document.getElementById('deleteDocumentModal')).hide();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+            $.ajax({
+                url: 'process/save_permissions.php',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    user_id: userId,
+                    permissions: permissions
+                }),
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Permissions saved successfully'
+                        }).then(() => {
+                            modal.modal('hide');
+                            location.reload();
+                        });
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'An error occurred while deleting the document.'
+                            text: response.message || 'Failed to save permissions'
                         });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to save permissions: ' + error
                     });
-            });
-
-            // Handle download button click
-            document.querySelectorAll('.btn-download').forEach(button => {
-                button.addEventListener('click', function () {
-                    const documentPath = this.getAttribute('data-path');
-                    window.location.href = 'process/download_document.php?path=' + encodeURIComponent(documentPath);
-                });
+                }
             });
         });
     </script>

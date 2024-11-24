@@ -27,7 +27,7 @@ try {
         error_log('share_document.php: Office ID: ' . $office_id);
 
         $documentController = new documentController();
-        $result = $documentController->shareDocument($document_id, $office_id);
+        $result = $documentController->shareDocument($document_id, $office_id, $_SESSION['csrf_token']);
 
         if ($result['status'] === 'success') {
             error_log('share_document.php: Document shared successfully');

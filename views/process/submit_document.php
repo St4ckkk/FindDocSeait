@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    $result = $documentController->submitDocument($params);
+    // Directly pass the CSRF token from the session
+    $result = $documentController->submitDocument($params, $_SESSION['csrf_token']);
     echo json_encode($result);
 }
 ?>
