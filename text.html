@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+      }
+
+      body {
+        background-color: #f0f8ff;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        width: 100%;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background: white;
+        border-radius: 15px 15px 30px 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 15px;
+        background: #1e90ff;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .header h1 {
+        font-size: 2.8em;
+        color: #1e90ff;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.2em;
+        color: #666;
+      }
+
+      .contact-info {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        background: #f8fbff;
+        border-radius: 20px;
+        font-size: 0.9em;
+        color: #1976d2;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .contact-item:hover {
+        background: #e3f2fd;
+        transform: translateY(-2px);
+      }
+
+      .contact-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+
+      .service-card {
+        background: white;
+        border-radius: 15px 15px 30px 30px;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 15px;
+        background: #1e90ff;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .service-card h2 {
+        color: #1e90ff;
+        margin-bottom: 25px;
+        text-align: center;
+        font-size: 1.8em;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e6f3ff;
+      }
+
+      .service-level {
+        margin-bottom: 25px;
+        padding: 15px;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+      }
+
+      .service-level:hover {
+        transform: translateY(-5px);
+      }
+
+      .basic {
+        background: #f8fbff;
+        border-left: 4px solid #90caf9;
+      }
+
+      .basic h3 {
+        color: #1976d2;
+        font-size: 1.4em;
+      }
+
+      .intermediate {
+        background: #e3f2fd;
+        border-left: 4px solid #42a5f5;
+      }
+
+      .intermediate h3 {
+        color: #1565c0;
+        font-size: 1.5em;
+      }
+
+      .thesis {
+        background: #bbdefb;
+        border-left: 4px solid #1e88e5;
+      }
+
+      .thesis h3 {
+        color: #0d47a1;
+        font-size: 1.6em;
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 5px;
+      }
+
+      .price {
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      .rush-label {
+        color: #e91e63;
+        font-size: 0.9em;
+        margin-left: 5px;
+      }
+
+      .service-level h3 {
+        margin-bottom: 15px;
+      }
+
+      .note {
+        font-size: 0.9em;
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        background: #f8fbff;
+        border-radius: 5px;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2.2em;
+        }
+
+        .service-card {
+          padding: 15px;
+        }
+
+        .service-level {
+          padding: 12px;
+        }
+
+        .contact-info {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .contact-item {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>PocketFriendly Tech</h1>
+        <p>Professional Service Rates</p>
+        <div class="contact-info">
+          <a href="mailto:keyanandydelgado@gmail.com" class="contact-item">
+            <svg
+              class="contact-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            keyanandydelgado@gmail.com
+          </a>
+          <a
+            href="https://www.facebook.com/keyan.andy.delgado"
+            target="_blank"
+            class="contact-item"
+          >
+            <svg
+              class="contact-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+              />
+            </svg>
+            Keyan Andy Delgado
+          </a>
+        </div>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <h2>Documentation Papers</h2>
+
+          <div class="service-level basic">
+            <h3>Basic Level</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱500</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱750</span>
+            </div>
+          </div>
+
+          <div class="service-level intermediate">
+            <h3>Intermediate Level</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱1,000</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱1,500</span>
+            </div>
+          </div>
+
+          <div class="service-level thesis">
+            <h3>Thesis/Capstone</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱5,000</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱7,500</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <h2>Web Applications</h2>
+
+          <div class="service-level basic">
+            <h3>Basic Level</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱2,500</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱3,750</span>
+            </div>
+          </div>
+
+          <div class="service-level intermediate">
+            <h3>Intermediate Level</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱10,000</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱15,000</span>
+            </div>
+          </div>
+
+          <div class="service-level thesis">
+            <h3>Thesis/Capstone</h3>
+            <div class="price-row">
+              <span>Standard</span>
+              <span class="price">₱20,000</span>
+            </div>
+            <div class="price-row">
+              <span
+                >Rush Service<span class="rush-label">(Priority)</span></span
+              >
+              <span class="price">₱30,000</span>
+            </div>
+            <p class="note">
+              * Price is negotiable depending on system requirements
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll('.service-level').forEach((level) => {
+        level.addEventListener('mouseover', () => {
+          level.style.transform = 'translateY(-5px)';
+          level.style.transition = 'all 0.3s ease';
+        });
+
+        level.addEventListener('mouseout', () => {
+          level.style.transform = 'translateY(0)';
+        });
+      });
+    </script>
+  </body>
+</html>
