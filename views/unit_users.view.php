@@ -211,6 +211,9 @@ $roles = $userController->getAllRoles();
                 permissions.push($(this).val());
             });
 
+            console.log('Saving permissions for user ID:', userId);
+            console.log('Permissions:', permissions);
+
             $.ajax({
                 url: 'process/save_permissions.php',
                 method: 'POST',
@@ -221,6 +224,7 @@ $roles = $userController->getAllRoles();
                 }),
                 dataType: 'json',
                 success: function (response) {
+                    console.log('Response:', response);
                     if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
@@ -239,6 +243,10 @@ $roles = $userController->getAllRoles();
                     }
                 },
                 error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    console.error('XHR:', xhr);
+                    console.error('Status:', status);
+                    console.log('Response Text:', xhr.responseText); // Log the response text
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',

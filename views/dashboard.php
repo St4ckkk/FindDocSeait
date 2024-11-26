@@ -369,10 +369,12 @@ foreach ($offices as $office) {
 
             <h5 class="section-title mt-4">Others</h5>
             <div class="document-grid">
-              <div class="document-item">
-                <i class="bi bi-people"></i>
-                <span>Unit Users</span>
-              </div>
+              <a href="unit_users.view.php">
+                <div class="document-item">
+                  <i class="bi bi-people"></i>
+                  <span>Unit Users</span>
+                </div>
+              </a>
             </div>
           </div>
         </div>
