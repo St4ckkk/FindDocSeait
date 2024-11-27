@@ -85,7 +85,7 @@ class sessionController
         }
     }
 
-    // Modified login method to include CSRF token generation
+    // Modified login method to include CSRF token generation and login attempts
     public function login($username, $password)
     {
         try {
@@ -96,49 +96,81 @@ class sessionController
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user && password_verify($password, $user['password'])) {
-                // Generate new CSRF token
-                $csrfToken = $this->generateCsrfToken();
+            if ($user) {
+                $ipManager = new VirtualIPManager();
+                $virtualIp = $ipManager->assignVirtualIP($user['id']);
 
-                // Store token in session and database
-                if (!$this->storeCsrfToken($user['id'], $csrfToken)) {
-                    throw new Exception("Failed to store CSRF token");
+                // Check if the IP address is blocked
+                if ($ipManager->isIPBlocked($virtualIp)) {
+                    $this->logLoginAttempt($user['id'], 'blocked', 'high');
+                    return ['status' => 'error', 'message' => 'Your IP address is blocked.'];
                 }
 
-                session_start();
-                // Set other session variables
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['authorized'] = $user['id'];
-                $_SESSION['user_name'] = $user['username'];
-                $_SESSION['role_id'] = $user['role_id'];
-                $_SESSION['role_name'] = $user['role_name']; // Add role_name to session
-                $_SESSION['fullname'] = $user['fullname'];
-                $_SESSION['office_id'] = $user['office_id'];
-                $_SESSION['otp_verified'] = $user['otp_verified'];
-                $_SESSION['csrf_token'] = $csrfToken; // Use the newly generated token
+                if ($user['login_attempts'] >= 3) {
+                    $ipManager->blockVirtualIP($virtualIp, 'Too many failed login attempts');
+                    $this->logLoginAttempt($user['id'], 'blocked', 'high');
+                    return ['status' => 'error', 'message' => 'Account locked due to too many failed login attempts'];
+                }
 
-                // Check if OTP verification is required
-                if (!$user['otp_verified']) {
-                    $_SESSION['otp'] = rand(100000, 999999);
-                    error_log("Generated OTP: " . $_SESSION['otp']);
+                if (password_verify($password, $user['password'])) {
+                    // Reset login attempts on successful login
+                    $query = "UPDATE users SET login_attempts = 0 WHERE id = :user_id";
+                    $stmt = $this->db->prepare($query);
+                    $stmt->execute([':user_id' => $user['id']]);
+
+                    // Generate new CSRF token
+                    $csrfToken = $this->generateCsrfToken();
+
+                    // Store token in session and database
+                    if (!$this->storeCsrfToken($user['id'], $csrfToken)) {
+                        throw new Exception("Failed to store CSRF token");
+                    }
+
+                    session_start();
+                    // Set other session variables
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['authorized'] = $user['id'];
+                    $_SESSION['user_name'] = $user['username'];
+                    $_SESSION['role_id'] = $user['role_id'];
+                    $_SESSION['role_name'] = $user['role_name']; // Add role_name to session
+                    $_SESSION['fullname'] = $user['fullname'];
+                    $_SESSION['office_id'] = $user['office_id'];
+                    $_SESSION['otp_verified'] = $user['otp_verified'];
+                    $_SESSION['csrf_token'] = $csrfToken; // Use the newly generated token
+
+                    // Check if OTP verification is required
+                    if (!$user['otp_verified']) {
+                        $_SESSION['otp'] = rand(100000, 999999);
+                        error_log("Generated OTP: " . $_SESSION['otp']);
+                        return [
+                            'status' => 'otp_required',
+                            'message' => 'OTP required for first-time login',
+                            'csrf_token' => $csrfToken
+                        ];
+                    }
+
+                    // Log the login attempt
+                    $this->logLoginAttempt($user['id'], 'success', 'low');
+
                     return [
-                        'status' => 'otp_required',
-                        'message' => 'OTP required for first-time login',
+                        'status' => 'success',
+                        'message' => 'Login successful',
                         'csrf_token' => $csrfToken
                     ];
+                } else {
+                    // Increment login attempts on failed login
+                    $query = "UPDATE users SET login_attempts = login_attempts + 1 WHERE id = :user_id";
+                    $stmt = $this->db->prepare($query);
+                    $stmt->execute([':user_id' => $user['id']]);
+
+                    // Log the failed login attempt
+                    $this->logLoginAttempt($user['id'], 'error', 'high');
+
+                    return ['status' => 'error', 'message' => 'Invalid username or password'];
                 }
-
-                // Log the login attempt
-                $this->logLoginAttempt($user['id'], 'success', 'low');
-
-                return [
-                    'status' => 'success',
-                    'message' => 'Login successful',
-                    'csrf_token' => $csrfToken
-                ];
             }
 
-            // Log the failed login attempt
+            // Log the failed login attempt for non-existent user
             $this->logLoginAttempt(null, 'error', 'high');
 
             return ['status' => 'error', 'message' => 'Invalid username or password'];
@@ -293,6 +325,8 @@ class sessionController
             return ['status' => 'error', 'message' => 'An error occurred during login with passkey'];
         }
     }
+
+    
 
     public function logout()
     {

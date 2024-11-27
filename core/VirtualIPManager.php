@@ -16,22 +16,6 @@ class VirtualIPManager
         $this->db = $database->getConnection();
     }
 
-    // private function initializeIPTable()
-    // {
-    //     $sql = "CREATE TABLE IF NOT EXISTS virtual_ips (
-    //         id INT AUTO_INCREMENT PRIMARY KEY,
-    //         user_id INT UNIQUE,
-    //         virtual_ip VARCHAR(45),
-    //         assigned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    //         last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    //         is_blocked BOOLEAN DEFAULT FALSE,
-    //         block_reason TEXT,
-    //         FOREIGN KEY (user_id) REFERENCES users(id)
-    //     )";
-    //     $stmt = $this->db->prepare($sql);
-    //     $stmt->execute();
-    // }
-
     private function generateRandomIP()
     {
         $range = $this->ip_ranges[array_rand($this->ip_ranges)];
@@ -76,6 +60,13 @@ class VirtualIPManager
         return $stmt->execute();
     }
 
+    public function unblockVirtualIP($virtual_ip)
+    {
+        $stmt = $this->db->prepare("UPDATE virtual_ips SET is_blocked = FALSE, block_reason = NULL WHERE virtual_ip = ?");
+        $stmt->bindParam(1, $virtual_ip);
+        return $stmt->execute();
+    }
+
     public function isIPBlocked($virtual_ip)
     {
         $stmt = $this->db->prepare("SELECT is_blocked FROM virtual_ips WHERE virtual_ip = ?");
@@ -87,6 +78,20 @@ class VirtualIPManager
             return $result['is_blocked'];
         }
         return false;
+    }
+
+    public function resetLoginAttempts($user_id)
+    {
+        try {
+            $query = "UPDATE users SET login_attempts = 0 WHERE id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->execute();
+            return true;
+        } catch (Exception $e) {
+            error_log("Reset Login Attempts Error: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getVirtualIP($user_id)

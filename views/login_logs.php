@@ -15,10 +15,12 @@ $virtualIPManager = new VirtualIPManager();
 function getStatusBadgeClass($status)
 {
     switch ($status) {
-        case 'Success':
+        case 'success':
             return 'badge bg-success';
-        case 'Failed':
+        case 'failed':
             return 'badge bg-danger';
+        case 'blocked':
+            return 'badge bg-warning';
         default:
             return 'badge bg-secondary';
     }
@@ -27,11 +29,11 @@ function getStatusBadgeClass($status)
 function getRiskLevelBadgeClass($riskLevel)
 {
     switch ($riskLevel) {
-        case 'Low':
+        case 'low':
             return 'badge bg-success';
-        case 'Medium':
+        case 'medium':
             return 'badge bg-warning';
-        case 'High':
+        case 'high':
             return 'badge bg-danger';
         default:
             return 'badge bg-secondary';
@@ -120,6 +122,9 @@ function getRiskLevelBadgeClass($riskLevel)
                                                     <button class="btn btn-danger btn-sm btn-block"
                                                         data-ip="<?php echo htmlspecialchars($log['ip_address']); ?>"
                                                         data-user-id="<?php echo htmlspecialchars($log['user_id']); ?>">Block</button>
+                                                    <button class="btn btn-success btn-sm btn-unblock"
+                                                        data-ip="<?php echo htmlspecialchars($log['ip_address']); ?>"
+                                                        data-user-id="<?php echo htmlspecialchars($log['user_id']); ?>">Unblock</button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -192,6 +197,59 @@ function getRiskLevelBadgeClass($riskLevel)
                                     Swal.fire(
                                         'Error!',
                                         'An error occurred while blocking the user.',
+                                        'error'
+                                    );
+                                });
+                        }
+                    });
+                });
+            });
+
+            // Handle unblock button click
+            document.querySelectorAll('.btn-unblock').forEach(button => {
+                button.addEventListener('click', function () {
+                    const userId = this.getAttribute('data-user-id');
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You want to unblock this user!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, unblock it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch('process/unblock_user.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `user_id=${encodeURIComponent(userId)}`
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Response:', data);
+                                    if (data.status === 'success') {
+                                        Swal.fire(
+                                            'Unblocked!',
+                                            'The user has been unblocked.',
+                                            'success'
+                                        ).then(() => {
+                                            location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Failed to unblock the user: ' + data.message,
+                                            'error'
+                                        );
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire(
+                                        'Error!',
+                                        'An error occurred while unblocking the user.',
                                         'error'
                                     );
                                 });

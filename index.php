@@ -230,6 +230,26 @@
     .swal2-container {
         z-index: 9999;
     }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 60px;
+        height: 60px;
+        animation: spin 2s linear infinite;
+        margin: 20px auto 0;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
 <body>
@@ -424,6 +444,20 @@
                                 if (result.isConfirmed) {
                                     window.location.href = 'views/dashboard.php';
                                 }
+                            });
+                        } else if (response.status === 'error' && response.message === 'Account locked due to too many failed login attempts') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Account Locked',
+                                text: response.message,
+                                confirmButtonColor: '#d33'
+                            });
+                        } else if (response.status === 'error' && response.message === 'Your IP address is blocked.') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Blocked',
+                                text: response.message,
+                                confirmButtonColor: '#d33'
                             });
                         } else {
                             Swal.fire({
