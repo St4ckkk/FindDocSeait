@@ -3,6 +3,7 @@ session_start();
 include_once '../includes/header.php';
 include_once '../includes/sidebar.php';
 include_once '../core/userController.php';
+
 if (!isset($_SESSION['csrf_token'])) {
   header("Location: ../unauthorized.php");
   exit();
@@ -17,6 +18,8 @@ foreach ($offices as $office) {
     break;
   }
 }
+
+$userRole = $userController->getUserRole($_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>
@@ -234,7 +237,6 @@ foreach ($offices as $office) {
                 </div>
               </div>
 
-
               <div class="form-group row">
                 <label class="col-sm-4 col-form-label">To:</label>
                 <div class="col-sm-8">
@@ -326,10 +328,6 @@ foreach ($offices as $office) {
                 <span>Receiving New</span>
               </div>
               <div class="document-item">
-                <i class="bi bi-inbox"></i>
-                <span>Incoming</span>
-              </div>
-              <div class="document-item">
                 <i class="bi bi-clock-history"></i>
                 <span>Pending</span>
               </div>
@@ -338,44 +336,22 @@ foreach ($offices as $office) {
                 <span>Forwarded</span>
               </div>
               <div class="document-item">
-                <i class="bi bi-archive"></i>
-                <span>Deferred</span>
-              </div>
-              <div class="document-item">
-                <i class="bi bi-file-earmark-plus"></i>
-                <span>Submit New</span>
-              </div>
-              <div class="document-item">
-                <i class="bi bi-file-check"></i>
-                <span>Acted Docs</span>
+                <i class="bi bi-folder"></i>
+                <span>All Documents</span>
               </div>
             </div>
 
-            <h5 class="section-title mt-4">Requests</h5>
-            <div class="document-grid">
-              <div class="document-item">
-                <i class="bi bi-envelope"></i>
-                <span>New Request</span>
+            <?php if ($userRole === 'Admin' || $userRole === 'Super Admin'): ?>
+              <h5 class="section-title mt-4">Others</h5>
+              <div class="document-grid">
+                <a href="unit_users.view.php">
+                  <div class="document-item">
+                    <i class="bi bi-people"></i>
+                    <span>Unit Users</span>
+                  </div>
+                </a>
               </div>
-              <div class="document-item">
-                <i class="bi bi-envelope-open"></i>
-                <span>Pending Requests</span>
-              </div>
-              <div class="document-item">
-                <i class="bi bi-envelope-check"></i>
-                <span>Completed Requests</span>
-              </div>
-            </div>
-
-            <h5 class="section-title mt-4">Others</h5>
-            <div class="document-grid">
-              <a href="unit_users.view.php">
-                <div class="document-item">
-                  <i class="bi bi-people"></i>
-                  <span>Unit Users</span>
-                </div>
-              </a>
-            </div>
+            <?php endif; ?>
           </div>
         </div>
       </div>

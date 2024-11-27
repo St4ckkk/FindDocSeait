@@ -89,7 +89,7 @@ class sessionController
     public function login($username, $password)
     {
         try {
-            $query = "SELECT * FROM users WHERE username = :username";
+            $query = "SELECT users.*, roles.role_name FROM users JOIN roles ON users.role_id = roles.role_id WHERE username = :username";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':username', $username);
             $stmt->execute();
@@ -111,6 +111,7 @@ class sessionController
                 $_SESSION['authorized'] = $user['id'];
                 $_SESSION['user_name'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['role_name'] = $user['role_name']; // Add role_name to session
                 $_SESSION['fullname'] = $user['fullname'];
                 $_SESSION['office_id'] = $user['office_id'];
                 $_SESSION['otp_verified'] = $user['otp_verified'];
@@ -254,7 +255,7 @@ class sessionController
     public function loginWithPasskey($passkey)
     {
         try {
-            $query = "SELECT * FROM users WHERE passkey IS NOT NULL";
+            $query = "SELECT users.*, roles.role_name FROM users JOIN roles ON users.role_id = roles.role_id WHERE passkey IS NOT NULL";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
 
@@ -272,6 +273,7 @@ class sessionController
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['username'];
                     $_SESSION['role_id'] = $user['role_id'];
+                    $_SESSION['role_name'] = $user['role_name']; // Add role_name to session
                     $_SESSION['fullname'] = $user['fullname'];
                     $_SESSION['office_id'] = $user['office_id'];
                     $_SESSION['otp_verified'] = $user['otp_verified'];

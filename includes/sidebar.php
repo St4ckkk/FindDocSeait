@@ -91,6 +91,20 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="../views/all_documents.php">
+                <i class="bi bi-file-earmark"></i>
+                <span>All Documents</span>
+            </a>
+        </li>
+        <?php if ($_SESSION['role_name'] === 'Admin' || $_SESSION['role_name'] === 'Super Admin'): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="../views/unit_users.view.php">
+                    <i class="bi bi-people"></i>
+                    <span>Unit Users</span>
+                </a>
+            </li>
+        <?php endif; ?>
+        <li class="nav-item">
             <a class="nav-link" href="../logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>

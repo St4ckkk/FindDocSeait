@@ -61,7 +61,7 @@ class userController
         }
 
         // Insert the new admin
-        $query = "INSERT INTO users (fullname, username, password, email, role_id) VALUES (:fullname, :username, :password, :email, :role_id)";
+        $query = "INSERT INTO users (fullname, username, password, email, role_id, office_id) VALUES (:fullname, :username, :password, :email, :role_id, :office_id)";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':fullname', $params['fullname']);
         $stmt->bindParam(':username', $params['username']);
@@ -69,6 +69,7 @@ class userController
         $stmt->bindParam(':password', $hashedPassword);
         $stmt->bindParam(':email', $params['email']);
         $stmt->bindParam(':role_id', $params['role_id']);
+        $stmt->bindParam(':office_id', $params['office_id']);
 
         if ($stmt->execute()) {
             return ['status' => 'success'];
@@ -123,9 +124,10 @@ class userController
 
     public function getAllUsers()
     {
-        $query = "SELECT users.*, roles.role_name 
-                  FROM users 
-                  JOIN roles ON users.role_id = roles.role_id";
+        $query = "SELECT users.*, roles.role_name, offices.name as office_name 
+              FROM users 
+              JOIN roles ON users.role_id = roles.role_id
+              LEFT JOIN offices ON users.office_id = offices.office_id";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -151,6 +153,30 @@ class userController
             $permissions[] = $row['permission'];
         }
         return $permissions;
+    }
+
+    public function updateUserRole($user_id, $role_id)
+    {
+        $query = "UPDATE users SET role_id = :role_id WHERE id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':role_id', $role_id);
+        $stmt->bindParam(':user_id', $user_id);
+
+        if ($stmt->execute()) {
+            return ['status' => 'success'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to update role'];
+        }
+    }
+
+    public function getUserLoginLogs()
+    {
+        $query = "SELECT id, user_id, ip_address, user_agent, status, risk_level, device_type, os_type, browser_type 
+                  FROM login_logs 
+                  WHERE 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 }

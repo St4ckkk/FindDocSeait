@@ -2,14 +2,28 @@
 include_once '../core/userController.php';
 
 session_start();
-if (!isset($_SESSION['csrf_token'])) {
+
+// Check if the user is logged in and has a valid CSRF token
+if (!isset($_SESSION['csrf_token']) || !isset($_SESSION['user_id'])) {
     header("Location: ../unauthorized.php");
     exit();
 }
 
+// Create an instance of userController
 $userController = new userController();
+
+// Get the user's role
+$userRole = $userController->getUserRole($_SESSION['user_id']);
+
+// Check if the user has the role of Admin or Super Admin
+if ($userRole !== 'Admin' && $userRole !== 'Super Admin') {
+    header("Location: ../unauthorized.php");
+    exit();
+}
+
 $users = $userController->getAllUsers();
 $roles = $userController->getAllRoles();
+$offices = $userController->getOffices();
 ?>
 
 <!DOCTYPE html>
@@ -93,6 +107,8 @@ $roles = $userController->getAllRoles();
                                     Search:
                                     <input type="text" class="form-control form-control-sm">
                                 </div>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#addUserModal">Add User</button>
                             </div>
 
                             <div class="table-responsive">
@@ -102,8 +118,8 @@ $roles = $userController->getAllRoles();
                                             <th>Fullname</th>
                                             <th>Email</th>
                                             <th>Role</th>
+                                            <th>Office</th>
                                             <th>Permissions</th>
-                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -112,26 +128,27 @@ $roles = $userController->getAllRoles();
                                                 <td><?php echo htmlspecialchars($user['fullname']); ?></td>
                                                 <td><?php echo htmlspecialchars($user['email']); ?></td>
                                                 <td>
-                                                    <select class="form-select form-select-sm">
-                                                        <?php foreach ($roles as $role): ?>
-                                                            <option value="<?php echo htmlspecialchars($role['role_id']); ?>" <?php echo $user['role_id'] == $role['role_id'] ? 'selected' : ''; ?>>
-                                                                <?php echo htmlspecialchars($role['role_name']); ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                    <form class="role-form">
+                                                        <input type="hidden" name="user_id"
+                                                            value="<?php echo htmlspecialchars($user['id']); ?>">
+                                                        <select class="form-select form-select-sm" name="role_id">
+                                                            <?php foreach ($roles as $role): ?>
+                                                                <option
+                                                                    value="<?php echo htmlspecialchars($role['role_id']); ?>"
+                                                                    <?php echo $user['role_id'] == $role['role_id'] ? 'selected' : ''; ?>>
+                                                                    <?php echo htmlspecialchars($role['role_name']); ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </form>
                                                 </td>
+                                                <td><?php echo htmlspecialchars($user['office_name']); ?></td>
                                                 <td>
                                                     <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                         data-bs-target="#permissionsModal"
                                                         data-fullname="<?php echo htmlspecialchars($user['fullname']); ?>"
                                                         data-user-id="<?php echo htmlspecialchars($user['id']); ?>">View
                                                         Permissions</button>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-primary btn-sm save-btn"
-                                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Save</button>
-                                                    <button class="btn btn-danger btn-sm delete-btn"
-                                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Delete</button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -144,6 +161,63 @@ $roles = $userController->getAllRoles();
             </div>
         </section>
     </main>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="fullname" class="form-label">Fullname</label>
+                            <input type="text" class="form-control" id="fullname" name="fullname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role_id" class="form-label">Role</label>
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?php echo htmlspecialchars($role['role_id']); ?>">
+                                        <?php echo htmlspecialchars($role['role_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="office_id" class="form-label">Office</label>
+                            <select class="form-select" id="office_id" name="office_id" required>
+                                <?php foreach ($offices as $office): ?>
+                                    <option value="<?php echo htmlspecialchars($office['office_id']); ?>">
+                                        <?php echo htmlspecialchars($office['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveUserBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="permissionsModal" tabindex="-1" aria-labelledby="permissionsModalLabel"
@@ -284,6 +358,82 @@ $roles = $userController->getAllRoles();
                             icon: 'error',
                             title: 'Error',
                             text: 'Failed to save permissions: ' + error
+                        });
+                    }
+                });
+            });
+
+            $('.role-form select').on('change', function () {
+                var form = $(this).closest('.role-form');
+                var userId = form.find('input[name="user_id"]').val();
+                var roleId = form.find('select[name="role_id"]').val();
+
+                $.ajax({
+                    url: 'process/update_user_role.php',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        user_id: userId,
+                        role_id: roleId
+                    }),
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Role updated successfully'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to update role'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to update role: ' + error
+                        });
+                    }
+                });
+            });
+
+            $('#saveUserBtn').on('click', function () {
+                var form = $('#addUserForm');
+                var formData = form.serialize();
+
+                $.ajax({
+                    url: 'process/add_user.php',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'User added successfully'
+                            }).then(() => {
+                                $('#addUserModal').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to add user'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to add user: ' + error
                         });
                     }
                 });

@@ -242,6 +242,8 @@ class documentController
         return ['status' => 'success'];
     }
 
+
+
     public function shareDocument($document_id, $office_id, $csrfToken)
     {
         if (!$this->verifyCsrfToken($csrfToken)) {
@@ -297,5 +299,38 @@ class documentController
         $document = $stmt->fetch(PDO::FETCH_ASSOC);
         return $document;
     }
+
+    public function getAllDocuments($csrfToken, $userRole, $userOfficeId)
+    {
+        if (!$this->verifyCsrfToken($csrfToken)) {
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
+        }
+
+        if ($userRole === 'Admin' || $userRole === 'Super Admin') {
+            $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
+                      FROM documents 
+                      JOIN users ON documents.submitted_by = users.id 
+                      JOIN offices ON documents.recipient_office_id = offices.office_id 
+                      OR documents.office_id = offices.office_id";
+        } else {
+            $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
+                      FROM documents 
+                      JOIN users ON documents.submitted_by = users.id 
+                      JOIN offices ON documents.recipient_office_id = offices.office_id 
+                      OR documents.office_id = offices.office_id
+                      WHERE documents.recipient_office_id = :office_id OR documents.office_id = :office_id";
+        }
+
+        $stmt = $this->db->prepare($query);
+
+        if ($userRole !== 'Admin' && $userRole !== 'Super Admin') {
+            $stmt->bindParam(':office_id', $userOfficeId);
+        }
+
+        $stmt->execute();
+        $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $documents;
+    }
+
 }
 ?>
