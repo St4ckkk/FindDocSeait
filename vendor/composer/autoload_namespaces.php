@@ -6,4 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Illuminate\\Support' => array($vendorDir . '/illuminate/support'),
 );

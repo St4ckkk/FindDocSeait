@@ -7,6 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
 {
     public static $files = array (
+        '3b5531f8bb4716e1b6014ad7e734f545' => __DIR__ . '/..' . '/illuminate/support/Illuminate/Support/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'db356362850385d08a5381de2638b5fd' => __DIR__ . '/..' . '/mpdf/mpdf/src/functions.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
@@ -28,6 +29,7 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         ),
         'P' => 
         array (
+            'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'PhpOffice\\PhpWord\\' => 18,
@@ -42,6 +44,10 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
             'Mpdf\\' => 5,
             'Masterminds\\' => 12,
         ),
+        'J' => 
+        array (
+            'Jenssegers\\Agent\\' => 17,
+        ),
         'F' => 
         array (
             'FontLib\\' => 8,
@@ -49,6 +55,7 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         'D' => 
         array (
             'Dompdf\\' => 7,
+            'Detection\\' => 10,
             'DeepCopy\\' => 9,
         ),
     );
@@ -69,6 +76,10 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         'Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
+        'Psr\\SimpleCache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
         'Psr\\Log\\' => 
         array (
@@ -110,6 +121,10 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
+        'Jenssegers\\Agent\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jenssegers/agent/src',
+        ),
         'FontLib\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
@@ -118,9 +133,23 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
+        'Detection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src',
+        ),
         'DeepCopy\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'I' => 
+        array (
+            'Illuminate\\Support' => 
+            array (
+                0 => __DIR__ . '/..' . '/illuminate/support',
+            ),
         ),
     );
 
@@ -150,6 +179,7 @@ class ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit9ff7450c35d6dffe079f1b565454a13c::$classMap;
 
         }, null, ClassLoader::class);

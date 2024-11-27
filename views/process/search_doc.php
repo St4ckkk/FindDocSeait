@@ -2,18 +2,21 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include_once 'core/documentController.php';
+include_once '../../core/documentController.php';
 
 header('Content-Type: application/json');
+session_start();
+
+$documentController = new documentController(); // Instantiate the documentController class
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $tracking_number = $_POST['tracking_number'];
-    $documentController = new documentController();
-    $document = $documentController->getDocumentByTrackingNumber($tracking_number);
+    $document = $documentController->getDocumentByTrackingNumber($tracking_number, $_SESSION['csrf_token']);
 
     if ($document) {
         // Fetch tracking logs
-        $trackingLogs = $documentController->getTrackingLogsByTrackingNumber($tracking_number);
+        $trackingLogs = $documentController->getTrackingLogsByTrackingNumber($tracking_number, $_SESSION['csrf_token']);
 
         // Add status-specific messages
         $statusMessages = [

@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['csrf_token'])) {
+    header("Location: ../unauthorized.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,9 +17,9 @@
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="views/node_modules/sweetalert2/dist/sweetalert2.min.css">
-    <script src="views/node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="views/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
 
     <style>
         /* Keep existing styles */
@@ -346,10 +353,14 @@
             // Function to search document by tracking number
             function searchDocument(trackingNumber) {
                 if (trackingNumber) {
+                    const csrfToken = $('#csrfToken').val();
                     $.ajax({
-                        url: 'search_doc.php', // Ensure this path is correct
+                        url: 'process/search_doc.php', // Ensure this path is correct
                         type: 'POST',
-                        data: { tracking_number: trackingNumber },
+                        data: {
+                            tracking_number: trackingNumber,
+                            csrf_token: csrfToken
+                        },
                         dataType: 'json',
                         success: function (response) {
                             if (response.status === 'success') {
@@ -365,19 +376,29 @@
                                 // Clear previous timeline items
                                 $('#timeline').empty();
 
-                                // Append new timeline items
-                                trackingLogs.forEach(log => {
-                                    const timelineItem = `
-                                    <div class="timeline-item">
-                                        <div class="timeline-content">
-                                            <div class="timeline-date">${log.created_at}</div>
-                                            <div class="timeline-title">${log.title}</div>
-                                            <div class="timeline-desc">${log.message}</div>
+                                // Check if trackingLogs is an array
+                                if (Array.isArray(trackingLogs)) {
+                                    // Append new timeline items
+                                    trackingLogs.forEach(log => {
+                                        const timelineItem = `
+                                        <div class="timeline-item">
+                                            <div class="timeline-content">
+                                                <div class="timeline-date">${log.created_at}</div>
+                                                <div class="timeline-title">${log.title}</div>
+                                                <div class="timeline-desc">${log.message}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                `;
-                                    $('#timeline').append(timelineItem);
-                                });
+                                    `;
+                                        $('#timeline').append(timelineItem);
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Tracking logs data is not in the expected format.',
+                                        confirmButtonColor: '#d33'
+                                    });
+                                }
 
                                 $('#trackingContainer').show();
                                 localStorage.setItem('trackingNumber', trackingNumber);
@@ -403,12 +424,6 @@
                         }
                     });
                 }
-            }
-
-            // Check if there's a tracking number in local storage
-            const savedTrackingNumber = localStorage.getItem('trackingNumber');
-            if (savedTrackingNumber) {
-                searchDocument(savedTrackingNumber);
             }
 
             // Search functionality

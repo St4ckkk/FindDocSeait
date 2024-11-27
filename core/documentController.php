@@ -15,7 +15,16 @@ class documentController
     private function verifyCsrfToken($token)
     {
         if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
-            return true;
+            // Check the token in the users table
+            $query = "SELECT COUNT(*) FROM users WHERE csrf_token = :token";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':token', $token);
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+
+            if ($count > 0) {
+                return true;
+            }
         }
         return false;
     }
@@ -23,7 +32,7 @@ class documentController
     public function submitDocument($params, $csrfToken)
     {
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "INSERT INTO documents (submitted_by, office_id, document_type, details, purpose, recipient_office_id, document_path, status, tracking_number) 
@@ -46,7 +55,6 @@ class documentController
             return ['status' => 'error', 'message' => 'Failed to submit document'];
         }
     }
-
 
     private function getTrackingNumberById($document_id)
     {
@@ -85,16 +93,15 @@ class documentController
 
     public function getDocumentByTrackingNumber($tracking_number, $csrfToken)
     {
-
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
-                  FROM documents 
-                  JOIN users ON documents.submitted_by = users.id 
-                  JOIN offices ON documents.office_id = offices.office_id 
-                  WHERE documents.tracking_number = :tracking_number";
+              FROM documents 
+              JOIN users ON documents.submitted_by = users.id 
+              JOIN offices ON documents.office_id = offices.office_id 
+              WHERE documents.tracking_number = :tracking_number";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':tracking_number', $tracking_number);
         $stmt->execute();
@@ -107,12 +114,10 @@ class documentController
         return $document;
     }
 
-    public function getTrackingLogsByTrackingNumber($tracking_number)
+    public function getTrackingLogsByTrackingNumber($tracking_number, $csrfToken)
     {
-        $csrfToken = $_SESSION['csrf_token'];
-
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "SELECT tracking_logs.*, offices.name AS office_name 
@@ -131,7 +136,7 @@ class documentController
     public function acceptDocument($document_id, $status, $csrfToken, $accepted_by)
     {
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "UPDATE documents SET status = :status, accepted_by = :accepted_by WHERE id = :document_id";
@@ -154,7 +159,7 @@ class documentController
     {
         // Verify the CSRF token
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         // Prepare the SQL query to fetch submitted documents for the given recipient_office_id
@@ -176,7 +181,7 @@ class documentController
     {
         // Verify the CSRF token
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         // Prepare the SQL query to fetch pending documents for the given office_id
@@ -199,12 +204,10 @@ class documentController
         return $documents;
     }
 
-
     public function getDocumentPathById($document_id, $csrfToken)
     {
-
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "SELECT document_path FROM documents WHERE id = :document_id";
@@ -217,9 +220,8 @@ class documentController
 
     public function saveUserPermissions($user_id, $permissions, $csrfToken)
     {
-
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         // Delete existing permissions
@@ -240,12 +242,10 @@ class documentController
         return ['status' => 'success'];
     }
 
-
     public function shareDocument($document_id, $office_id, $csrfToken)
     {
-
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "UPDATE documents SET share_with = :office_id WHERE id = :id";
@@ -267,7 +267,7 @@ class documentController
         $csrfToken = $_SESSION['csrf_token'];
 
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "DELETE FROM documents WHERE id = :document_id";
@@ -286,7 +286,7 @@ class documentController
         $csrfToken = $_SESSION['csrf_token'];
 
         if (!$this->verifyCsrfToken($csrfToken)) {
-            return ['status' => 'error', 'message' => 'Invalid CSRF token'];
+            return ['status' => 'error', 'message' => 'You are not authorized or authenticated to do this request'];
         }
 
         $query = "SELECT * FROM documents WHERE id = :document_id";

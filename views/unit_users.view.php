@@ -34,6 +34,24 @@ $roles = $userController->getAllRoles();
     <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.min.css">
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+    <style>
+        .table-controls-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .entries-control,
+        .search-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .entries-control select,
+        .search-control input {
+            margin-left: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -53,71 +71,78 @@ $roles = $userController->getAllRoles();
             </nav>
         </div>
 
-        <div class="main-section">
-            <div class="users-table">
-                <div class="users-header">
-                    USER PERMISSIONS AND ROLES
-                </div>
-                <div class="table-controls-container">
-                    <div class="entries-control">
-                        Show
-                        <select class="form-select form-select-sm">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        entries
-                    </div>
-                    <div class="search-control">
-                        Search:
-                        <input type="text" class="form-control form-control-sm">
-                    </div>
-                </div>
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">USER PERMISSIONS AND ROLES</h5>
 
-                <table id="userPermissions" class="table datatable datatable-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Fullname</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Permissions</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $user): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($user['fullname']); ?></td>
-                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                <td>
+                            <div class="table-controls-container">
+                                <div class="entries-control">
+                                    Show
                                     <select class="form-select form-select-sm">
-                                        <?php foreach ($roles as $role): ?>
-                                            <option value="<?php echo htmlspecialchars($role['role_id']); ?>" <?php echo $user['role_id'] == $role['role_id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($role['role_name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
                                     </select>
-                                </td>
-                                <td>
-                                    <button class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#permissionsModal"
-                                        data-fullname="<?php echo htmlspecialchars($user['fullname']); ?>"
-                                        data-user-id="<?php echo htmlspecialchars($user['id']); ?>">View
-                                        Permissions</button>
-                                </td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm save-btn"
-                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Save</button>
-                                    <button class="btn btn-danger btn-sm delete-btn"
-                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Delete</button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                    entries
+                                </div>
+                                <div class="search-control">
+                                    Search:
+                                    <input type="text" class="form-control form-control-sm">
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table id="userPermissions" class="table datatable datatable-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fullname</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Permissions</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($users as $user): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($user['fullname']); ?></td>
+                                                <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <?php foreach ($roles as $role): ?>
+                                                            <option value="<?php echo htmlspecialchars($role['role_id']); ?>" <?php echo $user['role_id'] == $role['role_id'] ? 'selected' : ''; ?>>
+                                                                <?php echo htmlspecialchars($role['role_name']); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#permissionsModal"
+                                                        data-fullname="<?php echo htmlspecialchars($user['fullname']); ?>"
+                                                        data-user-id="<?php echo htmlspecialchars($user['id']); ?>">View
+                                                        Permissions</button>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-primary btn-sm save-btn"
+                                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Save</button>
+                                                    <button class="btn btn-danger btn-sm delete-btn"
+                                                        data-id="<?php echo htmlspecialchars($user['id']); ?>">Delete</button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Modal -->
@@ -161,98 +186,107 @@ $roles = $userController->getAllRoles();
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
     <script>
-        $('#permissionsModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var userId = button.data('user-id');
-            var modal = $(this);
+        document.addEventListener('DOMContentLoaded', function () {
+            new simpleDatatables.DataTable("#userPermissions", {
+                searchable: true,
+                fixedHeight: true,
+                perPage: 10,
+                perPageSelect: [10, 25, 50, 100]
+            });
 
-            // Store the userId in the modal for later use
-            modal.data('user-id', userId);
+            $('#permissionsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var userId = button.data('user-id');
+                var modal = $(this);
 
-            // Clear previous permissions
-            modal.find('input[type="checkbox"]').prop('checked', false);
+                // Store the userId in the modal for later use
+                modal.data('user-id', userId);
 
-            // Fetch existing permissions
-            $.ajax({
-                url: 'process/get_user_permissions.php',
-                method: 'GET',
-                data: { user_id: userId },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        var permissions = response.permissions;
-                        permissions.forEach(function (permission) {
-                            modal.find('input[value="' + permission + '"]').prop('checked', true);
-                        });
-                    } else {
+                // Clear previous permissions
+                modal.find('input[type="checkbox"]').prop('checked', false);
+
+                // Fetch existing permissions
+                $.ajax({
+                    url: 'process/get_user_permissions.php',
+                    method: 'GET',
+                    data: { user_id: userId },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            var permissions = response.permissions;
+                            permissions.forEach(function (permission) {
+                                modal.find('input[value="' + permission + '"]').prop('checked', true);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to fetch permissions'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: response.message || 'Failed to fetch permissions'
+                            text: 'Failed to fetch permissions: ' + error
                         });
                     }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to fetch permissions: ' + error
-                    });
-                }
-            });
-        });
-
-        $('#savePermissions').on('click', function () {
-            var modal = $('#permissionsModal');
-            var userId = modal.data('user-id');
-            var permissions = [];
-
-            modal.find('input[type="checkbox"]:checked').each(function () {
-                permissions.push($(this).val());
+                });
             });
 
-            console.log('Saving permissions for user ID:', userId);
-            console.log('Permissions:', permissions);
+            $('#savePermissions').on('click', function () {
+                var modal = $('#permissionsModal');
+                var userId = modal.data('user-id');
+                var permissions = [];
 
-            $.ajax({
-                url: 'process/save_permissions.php',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    user_id: userId,
-                    permissions: permissions
-                }),
-                dataType: 'json',
-                success: function (response) {
-                    console.log('Response:', response);
-                    if (response.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Permissions saved successfully'
-                        }).then(() => {
-                            modal.modal('hide');
-                            location.reload();
-                        });
-                    } else {
+                modal.find('input[type="checkbox"]:checked').each(function () {
+                    permissions.push($(this).val());
+                });
+
+                console.log('Saving permissions for user ID:', userId);
+                console.log('Permissions:', permissions);
+
+                $.ajax({
+                    url: 'process/save_permissions.php',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        user_id: userId,
+                        permissions: permissions
+                    }),
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log('Response:', response);
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Permissions saved successfully'
+                            }).then(() => {
+                                modal.modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to save permissions'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('XHR:', xhr);
+                        console.error('Status:', status);
+                        console.log('Response Text:', xhr.responseText); // Log the response text
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: response.message || 'Failed to save permissions'
+                            text: 'Failed to save permissions: ' + error
                         });
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error:', error);
-                    console.error('XHR:', xhr);
-                    console.error('Status:', status);
-                    console.log('Response Text:', xhr.responseText); // Log the response text
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to save permissions: ' + error
-                    });
-                }
+                });
             });
         });
     </script>

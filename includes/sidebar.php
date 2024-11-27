@@ -27,12 +27,12 @@
                 <span>Receiving New</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="../views/pending.view.php">
                 <i class="bi bi-arrow-left-right"></i>
                 <span>Routed/Incoming</span>
             </a>
-        </li>
+        </li> -->
         <li class="nav-item">
             <a class="nav-link" href="../views/pending.view.php">
                 <i class="bi bi-clock"></i>
@@ -45,13 +45,13 @@
                 <span>Forwarded</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="../views/defferred.view.php">
                 <i class="bi bi-exclamation-circle"></i>
                 <span>Deferred</span>
             </a>
-        </li>
-        <li class="nav-item">
+        </li> -->
+        <!-- <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#requests-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-envelope"></i>
                 <span>Requests</span>
@@ -82,6 +82,12 @@
             <a class="nav-link" href="#">
                 <i class="bi bi-plus-square"></i>
                 <span>Submit New</span>
+            </a>
+        </li> -->
+        <li class="nav-item">
+            <a class="nav-link" href="../views/tracking_doc.php">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Track Documents</span>
             </a>
         </li>
         <li class="nav-item">

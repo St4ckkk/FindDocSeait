@@ -1,10 +1,12 @@
 <?php
 include_once 'Database.php';
+include_once 'VirtualIPManager.php';
 require 'vendor/autoload.php'; // Include Composer's autoload
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use PHPGangsta_GoogleAuthenticator;
+// use Mobile_Detect;
+// use Jenssegers\Agent\Agent;
 
 class sessionController
 {
@@ -15,7 +17,7 @@ class sessionController
     {
         $database = new Database();
         $this->db = $database->getConnection();
-        // $this->ga = new PHPGangsta_GoogleAuthenticator();
+        $this->ga = new PHPGangsta_GoogleAuthenticator();
     }
 
     // Generate CSRF token
@@ -53,6 +55,34 @@ class sessionController
             return false;
         }
         return hash_equals($_SESSION['csrf_token'], $token);
+    }
+
+    private function logLoginAttempt($userId, $status, $riskLevel)
+    {
+        try {
+            $ipManager = new VirtualIPManager();
+            $virtualIp = $ipManager->assignVirtualIP($userId);
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+            $deviceType = 'unknown'; // You can use a library to detect the device type
+            $osType = 'unknown'; // You can use a library to detect the OS type
+            $browserType = 'unknown'; // You can use a library to detect the browser type
+
+            $query = "INSERT INTO login_logs (user_id, ip_address, user_agent, status, risk_level, device_type, os_type, browser_type) 
+                  VALUES (:user_id, :ip_address, :user_agent, :status, :risk_level, :device_type, :os_type, :browser_type)";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':user_id' => $userId,
+                ':ip_address' => $virtualIp,
+                ':user_agent' => $userAgent,
+                ':status' => $status,
+                ':risk_level' => $riskLevel,
+                ':device_type' => $deviceType,
+                ':os_type' => $osType,
+                ':browser_type' => $browserType
+            ]);
+        } catch (Exception $e) {
+            error_log("Log Login Attempt Error: " . $e->getMessage());
+        }
     }
 
     // Modified login method to include CSRF token generation
@@ -97,12 +127,18 @@ class sessionController
                     ];
                 }
 
+                // Log the login attempt
+                $this->logLoginAttempt($user['id'], 'success', 'low');
+
                 return [
                     'status' => 'success',
                     'message' => 'Login successful',
                     'csrf_token' => $csrfToken
                 ];
             }
+
+            // Log the failed login attempt
+            $this->logLoginAttempt(null, 'error', 'high');
 
             return ['status' => 'error', 'message' => 'Invalid username or password'];
 
