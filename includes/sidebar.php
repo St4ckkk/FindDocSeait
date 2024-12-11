@@ -39,12 +39,12 @@
                 <span>Pending</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="../views/forwarded.view.php">
                 <i class="bi bi-forward"></i>
                 <span>Forwarded</span>
             </a>
-        </li>
+        </li> -->
         <!-- <li class="nav-item">
             <a class="nav-link" href="../views/defferred.view.php">
                 <i class="bi bi-exclamation-circle"></i>

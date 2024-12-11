@@ -332,10 +332,6 @@ $userRole = $userController->getUserRole($_SESSION['user_id']);
                 <span>Pending</span>
               </div>
               <div class="document-item">
-                <i class="bi bi-forward"></i>
-                <span>Forwarded</span>
-              </div>
-              <div class="document-item">
                 <i class="bi bi-folder"></i>
                 <span>All Documents</span>
               </div>

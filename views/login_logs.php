@@ -119,9 +119,11 @@ function getRiskLevelBadgeClass($riskLevel)
                                                 <td><?php echo htmlspecialchars($log['os_type']); ?></td>
                                                 <td><?php echo htmlspecialchars($log['browser_type']); ?></td>
                                                 <td>
-                                                    <button class="btn btn-danger btn-sm btn-block"
-                                                        data-ip="<?php echo htmlspecialchars($log['ip_address']); ?>"
-                                                        data-user-id="<?php echo htmlspecialchars($log['user_id']); ?>">Block</button>
+                                                    <?php if ($log['status'] !== 'blocked'): ?>
+                                                        <button class="btn btn-danger btn-sm btn-block"
+                                                            data-ip="<?php echo htmlspecialchars($log['ip_address']); ?>"
+                                                            data-user-id="<?php echo htmlspecialchars($log['user_id']); ?>">Block</button>
+                                                    <?php endif; ?>
                                                     <button class="btn btn-success btn-sm btn-unblock"
                                                         data-ip="<?php echo htmlspecialchars($log['ip_address']); ?>"
                                                         data-user-id="<?php echo htmlspecialchars($log['user_id']); ?>">Unblock</button>

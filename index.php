@@ -14,223 +14,9 @@
     <script src="views/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="views/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-
+    <link rel="stylesheet" href="index.css">
 </head>
 <style>
-    body {
-        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        background: none;
-        color: #444444;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
-
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.3)),
-            url('assets/img/seait-logo.png') no-repeat center center fixed;
-        background-size: cover;
-        filter: blur(5px);
-        z-index: -1;
-        opacity: 0.9;
-    }
-
-    .logo {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .logo img {
-        width: 100px;
-        animation: spinY 5s linear infinite;
-    }
-
-    @keyframes spinY {
-        0% {
-            transform: rotateY(0deg);
-        }
-
-        100% {
-            transform: rotateY(360deg);
-        }
-    }
-
-
-    .header {
-        background: rgb(226, 123, 24);
-        padding: 15px 20px;
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1;
-    }
-
-    .logo-text {
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .search-bar {
-        display: flex;
-        gap: 5px;
-    }
-
-    .search-bar input {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 3px;
-    }
-
-    .search-bar button {
-        padding: 5px 15px;
-        background: white;
-        border: none;
-        border-radius: 3px;
-        color: #333;
-    }
-
-    .main-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        padding-top: 60px;
-        /* Adjust for header height */
-    }
-
-    .login-panel {
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 4px;
-        padding: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 300px;
-    }
-
-    .form-title {
-        color: #333;
-        font-size: 16px;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid rgb(226, 123, 24);
-        text-align: center;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    .form-label {
-        color: #333;
-        font-size: 14px;
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 6px 12px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        font-size: 14px;
-    }
-
-    .g-recaptcha {
-        transform: scale(0.9);
-        transform-origin: 0 0;
-    }
-
-    .button-group {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-
-    .btn {
-        padding: 6px 20px;
-        border-radius: 3px;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-cancel {
-        background: #f1f1f1;
-        color: #333;
-    }
-
-    .btn-submit {
-        background: rgb(226, 123, 24);
-        color: white;
-    }
-
-    .btn-submit:hover {
-        background: rgb(226, 123, 24);
-    }
-
-    .btn-passkey {
-        background-color: #f6f8fa;
-        border: 1px solid rgba(27, 31, 35, 0.15);
-        color: #24292e;
-    }
-
-    .btn-passkey:hover {
-        background-color: #e1e4e8;
-    }
-
-    .register-link {
-        text-align: center;
-        margin-top: 10px;
-    }
-
-    .register-link a {
-        color: rgb(226, 123, 24);
-        text-decoration: none;
-    }
-
-    .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid gray;
-    }
-
-    .divider:not(:empty)::before {
-        margin-right: 1em;
-    }
-
-    .divider:not(:empty)::after {
-        margin-left: 1em;
-    }
-
-    .swal2-container {
-        z-index: 9999;
-    }
-
     .loader {
         border: 16px solid #f3f3f3;
         border-radius: 50%;
@@ -238,7 +24,7 @@
         width: 60px;
         height: 60px;
         animation: spin 2s linear infinite;
-        margin: 20px auto 0;
+        margin: 0 auto;
     }
 
     @keyframes spin {
@@ -278,9 +64,6 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
-                <div class="form-group">
-                    <div class="g-recaptcha" data-sitekey="6LdjcIMqAAAAANy9mqljGZhmNpJjfvBYM7s7N6jP"></div>
-                </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-submit w-100">Sign in</button>
                 </div>
@@ -292,38 +75,28 @@
             <div class="button-group mt-3">
                 <button id="passkeyLoginBtn" class="btn btn-passkey w-100">Login with Passkey</button>
             </div>
-            <div class="button-group mt-3">
-                <button id="generateGoogleAuthBtn" class="btn btn-info w-100">Login using Google Authenticator</button>
-            </div>
         </div>
     </div>
 
-    <!-- OTP Modal -->
-    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmEmailModal" tabindex="-1" aria-labelledby="confirmEmailModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
+                    <h5 class="modal-title" id="confirmEmailModalLabel">Send OTP</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="otpForm">
-                        <div class="form-group">
-                            <label class="form-label">OTP</label>
-                            <input type="text" class="form-control" name="otp" id="otpInput" placeholder="Enter OTP"
-                                required>
-                        </div>
-                        <div class="button-group mt-3">
-                            <button type="submit" class="btn btn-submit w-100">Verify OTP</button>
-                        </div>
-                    </form>
-                    <button id="getOtpBtn" class="btn btn-info mt-3 w-100">Get OTP</button>
+                    <p>Do you want to send OTP to this email: <span id="userEmail"></span>?</p>
+                    <div id="otpLoader" class="loader" style="display: none;"></div> <!-- Loader element -->
+                    <div class="button-group mt-3">
+                        <button id="confirmSendOtpBtn" class="btn btn-submit w-100">Send OTP</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Passkey Modal -->
     <div class="modal fade" id="passkeyModal" tabindex="-1" aria-labelledby="passkeyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -373,29 +146,23 @@
         </div>
     </div>
 
-    <!-- Google Authenticator Modal -->
-    <div class="modal fade" id="googleAuthModal" tabindex="-1" aria-labelledby="googleAuthModalLabel"
-        aria-hidden="true">
+    <!-- OTP Input Modal -->
+    <div class="modal fade" id="otpInputModal" tabindex="-1" aria-labelledby="otpInputModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="googleAuthModalLabel">Google Authenticator</h5>
+                    <h5 class="modal-title" id="otpInputModalLabel">Enter OTP</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="qrCodeContainer" style="text-align: center; margin-bottom: 20px;"></div>
-                    <form id="googleAuthForm">
+                    <form id="otpForm">
                         <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" placeholder="Email" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Authenticator Code</label>
-                            <input type="text" class="form-control" name="authCode"
-                                placeholder="Enter Authenticator Code" required>
+                            <label class="form-label">OTP</label>
+                            <input type="text" class="form-control" name="otp" id="otpInput" placeholder="Enter OTP"
+                                required>
                         </div>
                         <div class="button-group mt-3">
-                            <button type="submit" class="btn btn-submit w-100">Verify Code</button>
+                            <button type="submit" class="btn btn-submit w-100">Verify OTP</button>
                         </div>
                     </form>
                 </div>
@@ -405,69 +172,85 @@
 
     <script>
         $(document).ready(function () {
-            function resetRecaptcha() {
-                grecaptcha.reset();
-            }
-
             $('#loginForm').on('submit', function (e) {
                 e.preventDefault();
 
-                const recaptchaResponse = grecaptcha.getResponse();
-                if (!recaptchaResponse) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Please complete the reCAPTCHA verification.',
-                        confirmButtonColor: '#d33'
-                    });
-                    return;
-                }
+                const formData = $(this).serialize();
 
-                const formData = $(this).serialize() + '&g-recaptcha-response=' + recaptchaResponse;
-
+                // First, fetch the email based on the username
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: 'get_email.php', // Endpoint to get email by username
                     type: 'POST',
                     data: formData,
                     dataType: 'json',
                     success: function (response) {
-                        if (response.status === 'otp_required') {
-                            $('#otpModal').modal('show');
-                        } else if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'Login successful!',
-                                allowOutsideClick: false,
-                                showConfirmButton: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = 'views/dashboard.php';
+                        if (response.status === 'success') {
+                            $('#userEmail').text(response.email);
+
+                            // Proceed with the existing login logic
+                            $.ajax({
+                                url: $('#loginForm').attr('action'),
+                                type: 'POST',
+                                data: formData,
+                                dataType: 'json',
+                                success: function (response) {
+                                    if (response.status === 'otp_required') {
+                                        $('#confirmEmailModal').modal('show'); // Corrected ID
+                                    } else if (response.status === 'success') {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Success',
+                                            text: 'Login successful!',
+                                            allowOutsideClick: false,
+                                            showConfirmButton: true
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = 'views/dashboard.php';
+                                            }
+                                        });
+                                    } else if (response.status === 'error' && response.message === 'Account locked due to too many failed login attempts') {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Account Locked',
+                                            text: response.message,
+                                            confirmButtonColor: '#d33'
+                                        });
+                                    } else if (response.status === 'error' && response.message === 'Your IP address is blocked.') {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Blocked',
+                                            text: response.message,
+                                            confirmButtonColor: '#d33'
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: response.message || 'Invalid credentials',
+                                            confirmButtonColor: '#d33'
+                                        });
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error:', error);
+                                    console.error('Status:', status);
+                                    console.error('Response:', xhr.responseText);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Connection Error',
+                                        text: 'Failed to connect to the server. Please try again.',
+                                        confirmButtonColor: '#d33'
+                                    });
                                 }
-                            });
-                        } else if (response.status === 'error' && response.message === 'Account locked due to too many failed login attempts') {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Account Locked',
-                                text: response.message,
-                                confirmButtonColor: '#d33'
-                            });
-                        } else if (response.status === 'error' && response.message === 'Your IP address is blocked.') {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Blocked',
-                                text: response.message,
-                                confirmButtonColor: '#d33'
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: response.message || 'Invalid credentials',
+                                text: response.message || 'Failed to fetch email',
                                 confirmButtonColor: '#d33'
                             });
                         }
-                        resetRecaptcha();
                     },
                     error: function (xhr, status, error) {
                         console.error('Error:', error);
@@ -479,11 +262,56 @@
                             text: 'Failed to connect to the server. Please try again.',
                             confirmButtonColor: '#d33'
                         });
-                        resetRecaptcha();
                     }
                 });
             });
 
+            $('#confirmSendOtpBtn').on('click', function () {
+                $('#confirmEmailModal').modal('hide');
+                $('#otpLoader').show(); // Show loader
+                $('#otpForm').hide(); // Hide OTP form
+
+                const email = $('#userEmail').text();
+
+                $.ajax({
+                    url: 'send_otp.php',
+                    type: 'POST',
+                    data: { email: email },
+                    dataType: 'json',
+                    success: function (response) {
+                        $('#otpLoader').hide(); // Hide loader
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'OTP Sent',
+                                text: 'The OTP has been sent to your email.',
+                                confirmButtonColor: '#3085d6'
+                            });
+                            $('#otpForm').show(); // Show OTP form
+                            $('#otpInputModal').modal('show'); // Show OTP input modal
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to send OTP',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        $('#otpLoader').hide(); // Hide loader
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Failed to connect to the server. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            });
             $('#otpForm').on('submit', function (e) {
                 e.preventDefault();
 
@@ -512,45 +340,6 @@
                                 icon: 'error',
                                 title: 'Error',
                                 text: response.message || 'Invalid OTP',
-                                confirmButtonColor: '#d33'
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Connection Error',
-                            text: 'Failed to connect to the server. Please try again.',
-                            confirmButtonColor: '#d33'
-                        });
-                    }
-                });
-            });
-
-            $('#getOtpBtn').on('click', function () {
-                $.ajax({
-                    url: 'login.php',
-                    type: 'POST',
-                    data: { action: 'getOtp' },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Your OTP',
-                                text: 'Your OTP is: ' + response.otp,
-                                confirmButtonColor: '#3085d6'
-                            }).then(() => {
-                                $('#otpInput').val(response.otp);
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'Failed to get OTP',
                                 confirmButtonColor: '#d33'
                             });
                         }
@@ -759,6 +548,5 @@
     </script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
-
 
 </html>

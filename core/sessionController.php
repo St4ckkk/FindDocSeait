@@ -218,6 +218,83 @@ class sessionController
         }
     }
 
+    public function sendOtp($email)
+    {
+        try {
+            // Check if the email is connected to a user
+            $query = "SELECT * FROM users WHERE email = :email";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                // Generate a random OTP
+                $otp = rand(100000, 999999);
+
+                // Save the OTP in the session
+                session_start();
+                $_SESSION['otp'] = $otp;
+
+                // Send the OTP via email using PHPMailer
+                $mail = new PHPMailer(true);
+
+                try {
+                    //Server settings
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'tpas052202@gmail.com';
+                    $mail->Password = 'ailamnlsomhhtglb';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    //Recipients
+                    $mail->setFrom('tpas052202@gmail.com', 'Administrator');
+                    $mail->addAddress($email);
+                    $mail->addReplyTo('tpas052202@gmail.com', 'Administrator');
+
+                    //Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Your OTP Code';
+                    $mail->Body = 'Your OTP code is: ' . $otp;
+
+                    $mail->send();
+                    return ['status' => 'success', 'message' => 'OTP sent successfully'];
+                } catch (Exception $e) {
+                    error_log("PHPMailer Error: " . $mail->ErrorInfo);
+                    error_log("PHPMailer Exception: " . $e->getMessage());
+                    return ['status' => 'error', 'message' => 'Failed to send email. Please try again later.'];
+                }
+            } else {
+                return ['status' => 'error', 'message' => 'Email not found'];
+            }
+        } catch (Exception $e) {
+            error_log("Send OTP Error: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'An error occurred while sending the OTP'];
+        }
+    }
+
+    public function getEmailByUsername($username)
+    {
+        try {
+            $query = "SELECT email FROM users WHERE username = :username";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                return ['status' => 'success', 'email' => $user['email']];
+            } else {
+                return ['status' => 'error', 'message' => 'User not found'];
+            }
+        } catch (Exception $e) {
+            error_log("Get Email Error: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'An error occurred while fetching the email'];
+        }
+    }
+
     public function sendPasskey($email)
     {
         try {
@@ -326,7 +403,7 @@ class sessionController
         }
     }
 
-    
+
 
     public function logout()
     {

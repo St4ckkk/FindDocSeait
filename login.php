@@ -14,19 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $recaptchaResponse = $_POST['g-recaptcha-response'];
 
-        // Verify CAPTCHA
-        $captchaSecret = '6LdjcIMqAAAAANy0BDCF1IRmzY6bBoKjUD-93xAd';
-        $captchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify?secret=$captchaSecret&response=$recaptchaResponse";
-        $captchaResponse = file_get_contents($captchaVerifyUrl);
-        $captchaData = json_decode($captchaResponse);
-
-        if ($captchaData->success) {
-            $result = $sessionController->login($username, $password);
-        } else {
-            $result = ['status' => 'error', 'message' => 'CAPTCHA verification failed'];
-        }
+        $result = $sessionController->login($username, $password);
     }
 
     echo json_encode($result);
