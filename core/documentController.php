@@ -307,18 +307,18 @@ class documentController
         }
 
         if ($userRole === 'Admin' || $userRole === 'Super Admin') {
-            $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
-                      FROM documents 
-                      JOIN users ON documents.submitted_by = users.id 
-                      JOIN offices ON documents.recipient_office_id = offices.office_id 
-                      OR documents.office_id = offices.office_id";
+            $query = "SELECT DISTINCT d.*, u.fullname AS submitted_by_name, o.name AS office_name 
+                      FROM documents d
+                      JOIN users u ON d.submitted_by = u.id 
+                      JOIN offices o ON d.recipient_office_id = o.office_id 
+                      OR d.office_id = o.office_id";
         } else {
-            $query = "SELECT documents.*, users.fullname AS submitted_by_name, offices.name AS office_name 
-                      FROM documents 
-                      JOIN users ON documents.submitted_by = users.id 
-                      JOIN offices ON documents.recipient_office_id = offices.office_id 
-                      OR documents.office_id = offices.office_id
-                      WHERE documents.recipient_office_id = :office_id OR documents.office_id = :office_id";
+            $query = "SELECT DISTINCT d.*, u.fullname AS submitted_by_name, o.name AS office_name 
+                      FROM documents d
+                      JOIN users u ON d.submitted_by = u.id 
+                      JOIN offices o ON d.recipient_office_id = o.office_id 
+                      OR d.office_id = o.office_id
+                      WHERE d.recipient_office_id = :office_id OR d.office_id = :office_id";
         }
 
         $stmt = $this->db->prepare($query);
@@ -331,6 +331,4 @@ class documentController
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $documents;
     }
-
 }
-?>

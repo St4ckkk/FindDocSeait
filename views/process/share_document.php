@@ -8,6 +8,8 @@ include_once '../../core/documentController.php';
 
 header('Content-Type: application/json');
 
+session_start();
+
 try {
     error_log('share_document.php: Script started');
 

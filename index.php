@@ -36,6 +36,11 @@
             transform: rotate(360deg);
         }
     }
+
+    .masked-email {
+        font-weight: bold;
+        color: #333;
+    }
 </style>
 
 <body>
@@ -87,8 +92,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Do you want to send OTP to this email: <span id="userEmail"></span>?</p>
-                    <div id="otpLoader" class="loader" style="display: none;"></div> <!-- Loader element -->
+                    <p>Do you want to send OTP to this email: <span id="userEmail" class="masked-email"></span>?</p>
+                    <div id="otpLoader" class="loader" style="display: none;"></div>
                     <div class="button-group mt-3">
                         <button id="confirmSendOtpBtn" class="btn btn-submit w-100">Send OTP</button>
                     </div>
@@ -172,22 +177,29 @@
 
     <script>
         $(document).ready(function () {
+            function maskEmail(email) {
+                if (!email) return '';
+                const [username, domain] = email.split('@');
+                const maskedUsername = username.length > 2
+                    ? username.slice(0, 2) + '*'.repeat(username.length - 2)
+                    : username;
+                return `${maskedUsername}@${domain}`;
+            }
+
             $('#loginForm').on('submit', function (e) {
                 e.preventDefault();
-
                 const formData = $(this).serialize();
-
                 // First, fetch the email based on the username
                 $.ajax({
-                    url: 'get_email.php', // Endpoint to get email by username
+                    url: 'get_email.php',
                     type: 'POST',
                     data: formData,
                     dataType: 'json',
                     success: function (response) {
                         if (response.status === 'success') {
-                            $('#userEmail').text(response.email);
-
-                            // Proceed with the existing login logic
+                            const maskedEmail = maskEmail(response.email);
+                            $('#userEmail').text(maskedEmail);
+                            $('#userEmail').attr('data-full-email', response.email); // Store full email in data attribute
                             $.ajax({
                                 url: $('#loginForm').attr('action'),
                                 type: 'POST',
@@ -195,7 +207,7 @@
                                 dataType: 'json',
                                 success: function (response) {
                                     if (response.status === 'otp_required') {
-                                        $('#confirmEmailModal').modal('show'); // Corrected ID
+                                        $('#confirmEmailModal').modal('show');
                                     } else if (response.status === 'success') {
                                         Swal.fire({
                                             icon: 'success',
@@ -233,8 +245,6 @@
                                 },
                                 error: function (xhr, status, error) {
                                     console.error('Error:', error);
-                                    console.error('Status:', status);
-                                    console.error('Response:', xhr.responseText);
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Connection Error',
@@ -254,8 +264,6 @@
                     },
                     error: function (xhr, status, error) {
                         console.error('Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'Connection Error',
@@ -269,9 +277,8 @@
             $('#confirmSendOtpBtn').on('click', function () {
                 $('#confirmEmailModal').modal('hide');
                 $('#otpLoader').show(); // Show loader
-                $('#otpForm').hide(); // Hide OTP form
 
-                const email = $('#userEmail').text();
+                const email = $('#userEmail').attr('data-full-email'); // Use the full email address
 
                 $.ajax({
                     url: 'send_otp.php',
@@ -287,7 +294,6 @@
                                 text: 'The OTP has been sent to your email.',
                                 confirmButtonColor: '#3085d6'
                             });
-                            $('#otpForm').show(); // Show OTP form
                             $('#otpInputModal').modal('show'); // Show OTP input modal
                         } else {
                             Swal.fire({
@@ -300,8 +306,6 @@
                     },
                     error: function (xhr, status, error) {
                         console.error('Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
                         $('#otpLoader').hide(); // Hide loader
                         Swal.fire({
                             icon: 'error',
@@ -312,6 +316,8 @@
                     }
                 });
             });
+
+
             $('#otpForm').on('submit', function (e) {
                 e.preventDefault();
 

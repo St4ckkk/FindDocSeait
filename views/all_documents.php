@@ -70,13 +70,16 @@ $userPermissions = $userController->getUserPermissions($_SESSION['user_id']);
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">ALL DOCUMENTS</h5>
-
                             <?php foreach ($offices as $office): ?>
                                 <?php if ($userRole === 'Admin' || $userRole === 'Super Admin' || $office['office_id'] == $userOfficeId): ?>
                                     <h6 class="mt-4"><?php echo htmlspecialchars($office['name']); ?></h6>
                                     <div class="row">
-                                        <?php foreach ($allDocuments as $document): ?>
-                                            <?php if ($document['recipient_office_id'] == $office['office_id'] || $document['office_id'] == $office['office_id']): ?>
+                                        <?php
+                                        $displayedDocuments = []; // Array to keep track of displayed documents
+                                        foreach ($allDocuments as $document):
+                                            if (($document['recipient_office_id'] == $office['office_id'] || $document['office_id'] == $office['office_id']) && !in_array($document['id'], $displayedDocuments)):
+                                                $displayedDocuments[] = $document['id']; // Add document ID to the displayed list
+                                                ?>
                                                 <div class="col-md-3">
                                                     <div class="card text-center">
                                                         <div class="card-body">
@@ -90,7 +93,6 @@ $userPermissions = $userController->getUserPermissions($_SESSION['user_id']);
                                                                 <a href="#" class="btn btn-primary btn-sm btn-view"
                                                                     data-path="<?php echo htmlspecialchars($document['document_path']); ?>">View</a>
                                                             <?php endif; ?>
-
                                                             <?php if (in_array('download_documents', $userPermissions)): ?>
                                                                 <a href="#" class="btn btn-primary btn-sm btn-download"
                                                                     data-path="<?php echo htmlspecialchars($document['document_path']); ?>">Download</a>
